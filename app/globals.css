@@ -3,7 +3,7 @@
    Colour: 50% base (--bg) / 30% structure (ink, muted, surfaces, lines) / <=20% accent (--a1).
    One accent hue. --a3 (teal) means "improved / after" only. --a2 is a data-series colour only.
    Type:   2 families (display, body), 3 weights (400/600/700), 9 sizes.
-   Space:  4/8-point scale. Radius: 8 / 16 / 24 / pill.
+   Space:  4/8-point scale. Radius: 10 (cards) / 6 (elements inside cards) / pill (buttons, chips).
    ===================================================================== */
 :root, [data-theme="dark"] {
   --bg: #0b0b11; --bg2: #11111a; --card: rgba(255,255,255,.04); --card-h: rgba(255,255,255,.07);
@@ -23,7 +23,7 @@
 }
 :root {
   --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px; --s9: 96px; --s10: 128px;
-  --r1: 8px; --r2: 16px; --r3: 24px; --rp: 999px;
+  --r1: 6px; --r2: 10px; --r3: 10px; --rp: 999px;
   --gutter: 24px; --sec-gap: 96px; --maxw: 1200px;
   --ease: cubic-bezier(.2,.8,.2,1);
 }
