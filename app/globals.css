@@ -76,28 +76,62 @@ html.seen .preloader { display: none; }
 .pre-inner { width: min(440px, calc(100% - 48px)); text-align: center; transition: opacity .35s, transform .6s; }
 .preloader.out .pre-inner { opacity: 0; transform: translateY(-24px); }
 .pre-tag { margin-bottom: var(--s5); }
-.pre-chart { width: 100%; height: auto; overflow: visible; }
-.pre-axis { stroke: var(--line); stroke-width: 1; }
-.pre-bar { fill: var(--a1); opacity: .9; }
-.pre-bar.b1 { fill: var(--a2); }
-.pre-bar.b2 { fill: var(--ink); opacity: .55; }
-.pre-line { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; transition: opacity .4s; }
-.pre-meter { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s5); margin: var(--s5) 0 var(--s4); text-align: left; }
+.pre-meter { display: flex; align-items: center; justify-content: space-between; gap: var(--s5); margin: var(--s5) 0 var(--s4); text-align: left; }
 .odo { display: inline-flex; align-items: flex-start; height: 1em; font-family: var(--font-display), sans-serif; font-weight: 700; font-size: 72px; line-height: 1; letter-spacing: -.04em; color: var(--ink); }
 .odo-d { display: block; width: .6em; height: 1em; overflow: hidden; }
 .odo-strip { display: flex; flex-direction: column; transform: translateY(calc(var(--d) * -1em)); transition: transform .5s cubic-bezier(.2,.8,.2,1); }
 .odo-strip i { display: block; height: 1em; font-style: normal; text-align: center; }
 .odo-pct { align-self: flex-end; margin: 0 0 .12em .08em; font-size: .38em; letter-spacing: 0; color: var(--muted); }
-.pre-stages { list-style: none; display: grid; gap: var(--s1); font-size: 14px; line-height: 20px; }
-.pre-stages li { display: flex; align-items: center; gap: var(--s2); color: var(--muted); transition: color .3s; }
-.pre-stages li.now, .pre-stages li.done { color: var(--ink); }
-.pre-stages b { flex: none; display: grid; place-items: center; width: 16px; height: 16px; border: 1.5px solid var(--line); border-radius: 4px; font-size: 11px; line-height: 1; font-weight: 700; transition: background .25s, border-color .25s; }
-.pre-stages li.now b { border-color: var(--a1); animation: blink 1s ease-in-out infinite; }
-.pre-stages li.done b { background: var(--ink); border-color: var(--ink); color: var(--ink-inv); }
+.pre-drum { height: 72px; min-width: 196px; overflow: hidden; text-align: left; -webkit-mask-image: linear-gradient(transparent, #000 32%, #000 68%, transparent); mask-image: linear-gradient(transparent, #000 32%, #000 68%, transparent); }
+.pre-drum ul { list-style: none; transition: transform .55s cubic-bezier(.2,.8,.2,1); }
+.pre-drum li { height: 24px; font-size: 14px; line-height: 24px; font-weight: 600; color: var(--muted); opacity: .3; transition: opacity .4s, color .4s; white-space: nowrap; }
+.pre-drum li.near { opacity: .55; }
+.pre-drum li.now { color: var(--ink); opacity: 1; }
 .pre-track { height: 4px; background: var(--line); border-radius: 4px; overflow: hidden; }
 .pre-track i { display: block; height: 100%; transform-origin: 0 50%; background: var(--a1); }
 .pre-name { font-family: var(--font-display), sans-serif; font-weight: 700; font-size: 32px; letter-spacing: -.02em; margin-top: var(--s6); }
-.pre-skip { margin-top: var(--s2); font-size: 12px; color: var(--muted); }
+.pre-scene { display: block; width: 100%; height: auto; overflow: visible; }
+.pre-ground { stroke: var(--line); stroke-width: 2; stroke-linecap: round; }
+.pbar { transform-box: fill-box; transform-origin: 50% 100%; transform: scaleY(0); opacity: 0; }
+.pbar.on { transform: scaleY(1); opacity: 1; transition: transform .55s cubic-bezier(.34,1.56,.64,1), opacity .2s; }
+.pbar.c0 { fill: var(--a1); } .pbar.c1 { fill: var(--a2); } .pbar.c2 { fill: var(--ink); opacity: 0; } .pbar.c2.on { opacity: .55; }
+.ptrend { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 260; stroke-dashoffset: 260; transition: stroke-dashoffset .8s ease; }
+.ptrend.on { stroke-dashoffset: 0; }
+
+/* the analyst */
+.ch-move { transition: transform .18s linear; }
+.ch-body, .ch-leg { fill: var(--ink); }
+.ch-ant { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
+.ch-led { fill: var(--a1); animation: blink 1.2s ease-in-out infinite; }
+.ch-led.ok { animation: none; fill: var(--a3); }
+.ch-face { fill: var(--bg); }
+.ch-eye { fill: var(--ink); }
+.ch-eyes { transition: transform .12s ease-out; }
+.ch-mouth { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; transition: d .2s; }
+.ch-badge { fill: var(--a1); }
+.ch-limb { stroke: var(--ink); stroke-width: 6; stroke-linecap: round; }
+.ch-clip { fill: var(--bg); stroke: var(--ink); stroke-width: 2; }
+.ch-clip-line { stroke: var(--muted); stroke-width: 1.5; stroke-linecap: round; }
+.ch-leg { transform-box: fill-box; transform-origin: 50% 0; }
+.walking .ch-leg.l { animation: stepL .28s ease-in-out infinite alternate; }
+.walking .ch-leg.r { animation: stepL .28s ease-in-out infinite alternate-reverse; }
+@keyframes stepL { from { transform: rotate(20deg); } to { transform: rotate(-20deg); } }
+.ch-idle { animation: bob 1.6s ease-in-out infinite; }
+@keyframes bob { 50% { transform: translateY(-2px); } }
+.ch-hop { animation: hop .55s cubic-bezier(.3,.9,.4,1); }
+@keyframes hop { 40% { transform: translateY(-24px); } }
+.ch-arm { transition: transform .3s var(--ease); }
+.arm-walk { animation: swing .28s ease-in-out infinite alternate; }
+@keyframes swing { from { transform: rotate(35deg); } to { transform: rotate(-10deg); } }
+.arm-work { animation: tap .5s ease-in-out infinite alternate; }
+@keyframes tap { from { transform: rotate(-32deg); } to { transform: rotate(-4deg); } }
+.arm-up { transform: rotate(-118deg); }
+.ch-say rect, .ch-say path { fill: var(--bg2); stroke: var(--line); stroke-width: 1; animation: sayin .3s var(--ease) both; }
+.ch-say path { stroke: none; }
+.ch-say text { fill: var(--ink); font-size: 12px; font-weight: 600; font-family: var(--font-body), sans-serif; animation: sayin .3s var(--ease) both; }
+@keyframes sayin { from { opacity: 0; } to { opacity: 1; } }
+.pre-skip { display: flex; align-items: center; justify-content: center; gap: var(--s3); margin-top: var(--s2); font-size: 12px; color: var(--muted); }
+.pre-skip button { font-size: 12px; font-weight: 600; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; padding: var(--s1) var(--s2); }
 
 /* ---------- buttons ----------
    Primary   : solid accent. One per region. (hero "See the work", contact e-mail)
