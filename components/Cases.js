@@ -56,16 +56,30 @@ const cases = [
     visual: { type: "stream", from: "Inbound leads", to: "CRM", n: 3000, suffix: "+", cap: "daily inbound leads" },
   },
   {
-    id: "growth",
-    tab: "Revenue & growth",
-    tag: "Revenue / growth analysis",
-    title: "Metrics behind a Rs. 100 Cr Series-A, and smarter lead allocation",
-    hero: ["Rs. 100 Cr", "Series-A"],
-    label: "fundraise supported",
-    flow: ["Financial + operational metrics", "Pitch decks & due diligence", "RM allocation logic", "Relationship coverage"],
-    problem: "The company needed rigorous metrics for investors, and an effective way to allocate leads to relationship managers.",
-    did: "Ran company-level financial and operational metric analysis. Owned RM allocation logic across India, assigning leads by entity type, revenue and GWP, and defined LSQ activity tracking for offline RM-assisted journeys.",
-    outcome: "Critical insights for investor pitch decks and due diligence, and better relationship coverage.",
+    id: "fundraise",
+    tab: "Series-A fundraise",
+    tag: "Fundraising · Investor analytics",
+    status: "In progress",
+    title: "The metrics behind a Rs. 100 Cr Series-A fundraise",
+    hero: [null, "Rs. 100 Cr"],
+    label: "Series-A fundraise in progress, supported with analysis",
+    flow: ["Financial + operational metrics", "Investor pitch decks", "Due diligence", "Series-A (in progress)"],
+    problem: "The Series-A fundraise needed clear company-level financial and operational metrics behind the story told to investors.",
+    did: "Spearheaded company-level financial and operational metric analysis supporting the fundraise.",
+    outcome: "Contributing critical insights for investor pitch decks and due diligence while the round is in progress.",
+    visual: { type: "dash" },
+  },
+  {
+    id: "allocation",
+    tab: "RM allocation",
+    tag: "Revenue operations · Lead allocation",
+    title: "Allocating leads to relationship managers across India",
+    hero: [null, "India-wide"],
+    label: "RM allocation logic owned",
+    flow: ["Incoming lead", "Entity type, revenue, GWP", "RM allocation", "Relationship coverage"],
+    problem: "Leads, including offline RM-assisted journeys, needed to reach the right relationship manager.",
+    did: "Owned RM allocation logic across India, assigning leads by entity type, revenue and GWP, and defined LSQ activity tracking for offline RM-assisted journeys.",
+    outcome: "Optimized relationship coverage across India.",
     visual: { type: "route" },
   },
   {
@@ -124,7 +138,7 @@ function Route() {
   const L = ["Entity type", "Revenue", "GWP"];
   return (
     <div className="vis route" aria-hidden="true">
-      <svg viewBox="0 0 260 130">
+      <svg viewBox="0 0 260 144">
         {L.map((t, n) => (
           <g key={t}>
             <rect x="0" y={10 + n * 40} width="84" height="26" rx="13" className="r-in" />
@@ -135,7 +149,7 @@ function Route() {
           </g>
         ))}
         {[0, 1, 2, 3].map((m) => <circle key={m} cx="224" cy={20 + m * 30} r="9" className="r-n" style={{ animationDelay: `${m * 0.25}s` }} />)}
-        <text x="224" y="127" textAnchor="middle" className="r-t">RMs</text>
+        <text x="224" y="140" textAnchor="middle" className="r-t">RMs</text>
       </svg>
     </div>
   );
@@ -157,11 +171,18 @@ export default function Cases() {
       </div>
       <article className="case glow" key={c.id} role="tabpanel">
         <div className="case-main">
-          <span className="tag">{c.tag}</span>
+          <div className="tag-row">
+            <span className="tag">{c.tag}</span>
+            {c.status && <span className="status"><i aria-hidden="true" />{c.status}</span>}
+          </div>
           <h3>{c.title}</h3>
           <div className="hero-metric">
-            <span className="from">{c.hero[0]}</span>
-            <span className="arrow">→</span>
+            {c.hero[0] && (
+              <>
+                <span className="from">{c.hero[0]}</span>
+                <span className="arrow">→</span>
+              </>
+            )}
             <span className="to">{c.hero[1]}</span>
           </div>
           <p className="hm-label">{c.label}</p>

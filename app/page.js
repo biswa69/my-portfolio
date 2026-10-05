@@ -77,7 +77,7 @@ export default function Home() {
           </div>
           <div className="kpi glow" data-reveal style={{ "--d": ".3s" }}>
             <p className="k-v"><strong><Counter to={100} prefix="Rs. " suffix=" Cr" /></strong></p>
-            <p className="k-l">Series-A fundraise supported with analysis</p>
+            <p className="k-l">Series-A fundraise in progress, supported with analysis</p>
           </div>
         </section>
 
@@ -138,7 +138,7 @@ export default function Home() {
               <h3>Business Analyst (Product &amp; Analytics) <small>BimaKavach · Bengaluru</small></h3>
               <ul>
                 <li>Drove a 0-to-1 Greylabs <b>AI voice bot pilot qualifying 3,000+ daily inbound leads</b>; optimized auto-dialer workflows with queue management, prioritization and CRM handoffs.</li>
-                <li>Led company-level financial and operational metric analysis supporting a <b>Rs. 100 Cr Series-A fundraise</b>, with insights for investor pitch decks and due diligence.</li>
+                <li>Led company-level financial and operational metric analysis supporting the <b>Rs. 100 Cr Series-A fundraise (in progress)</b>, with insights for investor pitch decks and due diligence.</li>
                 <li>Engineered an automated client cohort analysis framework: <b>~2 days to ~5 minutes</b>. Formulated customer segmentation strategies to evaluate cross-sell and upsell performance.</li>
                 <li>Led the end-to-end <b>migration of 90,000+ policies</b> across ~40 data points to Vaatun, restructuring architectures for 12K direct and 40K partner clients to enable RCA-ready reporting.</li>
                 <li>Defined LSQ activity tracking for offline RM-assisted journeys; owned <b>RM allocation logic across India</b> (entity type, revenue, GWP).</li>
