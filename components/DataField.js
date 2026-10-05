@@ -191,7 +191,7 @@ export default function DataField() {
         <canvas ref={cv} aria-hidden="true" />
         <span className="field-chip">↗ Pattern identified</span>
       </div>
-      <div className="field-ctl" role="group" aria-label="Data view">
+      <div className="seg field-ctl" role="group" aria-label="Data view">
         <button aria-pressed={mode === "messy"} onClick={() => choose("messy")}>Raw data</button>
         <button aria-pressed={mode === "organized"} onClick={() => choose("organized")}>Insight</button>
       </div>

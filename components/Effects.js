@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef } from "react";
 
-// Global behaviours: scroll reveals, scroll progress, cursor light, card spotlight, magnetic buttons.
+// Global behaviours: scroll reveals, scroll progress, cursor light, card spotlight.
 export default function Effects() {
   const glow = useRef(null);
 
@@ -43,27 +43,12 @@ export default function Effects() {
         g.style.setProperty("--mx", e.clientX - r.left + "px");
         g.style.setProperty("--my", e.clientY - r.top + "px");
       }
-      const m = e.target.closest?.(".magnetic");
-      if (m && !reduce) {
-        const r = m.getBoundingClientRect();
-        m.style.setProperty("--tx", (e.clientX - r.left - r.width / 2) * 0.22 + "px");
-        m.style.setProperty("--ty", (e.clientY - r.top - r.height / 2) * 0.3 + "px");
-      }
-    };
-    const onOut = (e) => {
-      const m = e.target.closest?.(".magnetic");
-      if (m) {
-        m.style.setProperty("--tx", "0px");
-        m.style.setProperty("--ty", "0px");
-      }
     };
     document.addEventListener("pointermove", onMove, { passive: true });
-    document.addEventListener("pointerout", onOut);
     return () => {
       io.disconnect();
       removeEventListener("scroll", onScroll);
       document.removeEventListener("pointermove", onMove);
-      document.removeEventListener("pointerout", onOut);
     };
   }, []);
 

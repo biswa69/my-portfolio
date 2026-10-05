@@ -35,7 +35,7 @@ export default function Nav() {
       </nav>
       <div className="nav-end">
         <ThemeToggle />
-        <a href="#contact" className="cta magnetic">Contact</a>
+        <a href="#contact" className="btn btn-secondary"><span>Contact</span></a>
       </div>
     </header>
   );

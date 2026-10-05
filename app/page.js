@@ -48,8 +48,8 @@ export default function Home() {
               Product Analytics and Business Intelligence.
             </p>
             <div className="actions rv" style={{ "--d": "1s" }}>
-              <a className="btn primary magnetic" href="#work"><span>See the work</span></a>
-              <a className="btn magnetic" href="#contact"><span>Get in touch</span></a>
+              <a className="btn btn-primary" href="#work"><span>See the work</span></a>
+              <a className="btn btn-secondary" href="#contact"><span>Get in touch</span></a>
             </div>
           </div>
           <div className="hero-vis rv" style={{ "--d": ".4s" }}>
@@ -173,8 +173,8 @@ export default function Home() {
           <p className="sec-k" data-reveal>06 · Contact</p>
           <h2 data-reveal>Let&rsquo;s turn your data into <em>decisions.</em></h2>
           <div className="actions" data-reveal>
-            <a className="btn primary big magnetic" href="mailto:biswajit2001june@gmail.com"><span>biswajit2001june@gmail.com</span></a>
-            <a className="btn big magnetic" href="https://linkedin.com/in/biswajit-saha" target="_blank" rel="noreferrer"><span>LinkedIn ↗</span></a>
+            <a className="btn btn-primary btn-lg" href="mailto:biswajit2001june@gmail.com"><span>biswajit2001june@gmail.com</span></a>
+            <a className="btn btn-secondary btn-lg" href="https://www.linkedin.com/in/biswajit-saha-72681b1a0/" target="_blank" rel="noreferrer"><span>LinkedIn ↗</span></a>
           </div>
         </section>
       </main>

@@ -1,11 +1,10 @@
-import { Bricolage_Grotesque, DM_Sans, DM_Mono } from "next/font/google";
+import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Preloader from "../components/Preloader";
 import Effects from "../components/Effects";
 
 const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-display", axes: ["wdth", "opsz"] });
 const body = DM_Sans({ subsets: ["latin"], variable: "--font-body" });
-const mono = DM_Mono({ subsets: ["latin"], variable: "--font-mono", weight: ["400", "500"] });
 
 export const metadata = {
   title: "Biswajit Saha — Data × Product × Business",
@@ -18,7 +17,7 @@ const boot = `(function(){try{var d=document.documentElement;d.classList.add('js
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`} data-theme="dark" suppressHydrationWarning>
+    <html lang="en" className={`${display.variable} ${body.variable}`} data-theme="dark" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: boot }} />
       </head>

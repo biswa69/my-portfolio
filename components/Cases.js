@@ -148,7 +148,7 @@ export default function Cases() {
   const c = cases.find((x) => x.id === id);
   return (
     <div className="cases">
-      <div className="case-tabs" role="tablist" aria-label="Case studies">
+      <div className="case-tabs seg" role="tablist" aria-label="Case studies">
         {cases.map((x) => (
           <button key={x.id} role="tab" aria-selected={x.id === id} className={x.id === id ? "on" : ""} onClick={() => setId(x.id)}>
             {x.tab}
