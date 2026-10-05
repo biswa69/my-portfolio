@@ -34,6 +34,7 @@ export default function Nav() {
         ))}
       </nav>
       <div className="nav-end">
+        <a className="nav-resume" href="/Biswajit-Saha-Resume.pdf" download>Resume</a>
         <ThemeToggle />
         <a href="#contact" className="btn btn-secondary"><span>Contact</span></a>
       </div>

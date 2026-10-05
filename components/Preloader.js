@@ -7,10 +7,10 @@ const STAGES = ["Ingesting raw data", "Cleaning & validating", "Modeling the met
 // Loading advances stage by stage with a short pause at each milestone, like real work,
 // instead of one smooth sweep through every number.
 const SEGMENTS = [
-  { to: 24, ms: 700 }, { hold: 200 },
-  { to: 52, ms: 650 }, { hold: 200 },
-  { to: 78, ms: 600 }, { hold: 180 },
-  { to: 100, ms: 520 },
+  { to: 24, ms: 300 }, { hold: 80 },
+  { to: 52, ms: 260 }, { hold: 80 },
+  { to: 78, ms: 240 }, { hold: 60 },
+  { to: 100, ms: 200 },
 ];
 const TOTAL = SEGMENTS.reduce((a, s) => a + (s.ms || s.hold), 0);
 const easeInOut = (x) => (x < 0.5 ? 2 * x * x : 1 - Math.pow(-2 * x + 2, 2) / 2);
@@ -70,7 +70,7 @@ export default function Preloader() {
       setPhase("out");
       setTimeout(() => d.classList.add("ready"), 250);
       try { sessionStorage.setItem("seen", "1"); } catch {}
-      setTimeout(() => setPhase("gone"), 1200);
+      setTimeout(() => setPhase("gone"), 900);
     };
     skip.current = finish;
     const start = performance.now();
@@ -78,7 +78,7 @@ export default function Preloader() {
       const el = t - start;
       setP(Math.round(progressAt(el)));
       if (el < TOTAL) raf = requestAnimationFrame(tick);
-      else setTimeout(finish, 350);
+      else setTimeout(finish, 150);
     };
     raf = requestAnimationFrame(tick);
     window.addEventListener("keydown", finish);

@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 
 const steps = [
-  { k: "Data", t: "I can work with raw, messy information.", d: "Before any chart, there is cleaning: transforming raw UPI transaction data with Advanced Excel and SQL, and migrating 90,000+ policies out of legacy systems.", f: ["SQL", "Advanced Excel", "Data migration"] },
+  { k: "Data", t: "I can work with raw, messy information.", d: "Before any chart, there is cleaning: fixing data-quality and recording issues, and migrating 90,000+ policies out of legacy systems.", f: ["SQL", "Data cleaning", "Data migration"] },
   { k: "Analysis", t: "I find the patterns, trends and gaps.", d: "Cohort analysis, customer segmentation and gap analysis, written in SQL with CTEs and window functions.", f: ["Cohort analysis", "Segmentation", "Gap analysis"] },
   { k: "Business", t: "I connect insight to a real problem.", d: "Company-level financial and operational metric analysis behind a Rs. 100 Cr Series-A fundraise that is still in progress: pitch decks and due diligence.", f: ["Rs. 100 Cr Series-A (in progress)", "Due diligence"] },
   { k: "Product", t: "I think in users, metrics and funnels.", d: "Queue management, prioritization and CRM handoffs for a 0-to-1 AI voice bot pilot, plus LSQ activity tracking for offline RM-assisted journeys.", f: ["Funnel tracking", "Prioritization", "KPI design"] },

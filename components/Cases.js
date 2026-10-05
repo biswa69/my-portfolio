@@ -14,6 +14,7 @@ const cases = [
     problem: "Cohort analysis of clients took around two days each time it was run.",
     did: "Engineered an automated client cohort analysis framework, then used it to formulate customer segmentation strategies.",
     outcome: "Turnaround dropped to about 5 minutes, and segments could be used to evaluate cross-sell and upsell performance.",
+    baseline: "Around two days per run, every time.",
     visual: { type: "race" },
   },
   {
@@ -21,25 +22,28 @@ const cases = [
     tab: "Data migration",
     tag: "Data & process transformation",
     title: "Moving 90,000+ policies off legacy systems",
-    hero: ["Legacy", "Vaatun"],
-    label: "~40 data points per policy",
-    flow: ["Legacy systems", "Restructure architecture", "Vaatun", "RCA-ready reporting"],
+    hero: [null, "90,000+"],
+    label: "policies migrated, ~40 data points each",
+    flow: ["Legacy systems", "Restructure architecture", "New system", "RCA-ready reporting"],
     problem: "Policy data lived in legacy systems and was not structured for root cause analysis.",
     did: "Led the end-to-end migration across ~40 data points, restructuring architectures for 12K direct and 40K partner clients.",
     outcome: "Data landed in a structure that enables RCA-ready reporting.",
-    visual: { type: "stream", from: "Legacy systems", to: "Vaatun", n: 90000, suffix: "+", cap: "policies migrated" },
+    baseline: "Data-quality issues and past recording issues meant hours of cleaning, then the data was fed into Metabase or Power BI by hand.",
+    next: "More real-time tracking for KMPs.",
+    visual: { type: "stream", from: "Legacy systems", to: "New system", n: 90000, suffix: "+", cap: "policies migrated" },
   },
   {
     id: "dash",
     tab: "KPI dashboards",
     tag: "Dashboarding",
     title: "One place for operational and financial KPIs",
-    hero: ["Scattered logic", "One standard"],
+    hero: ["Separate Excel trackers", "One dashboard"],
     label: "Power BI + Metabase",
     flow: ["Raw data", "Standardized logic", "Power BI / Metabase", "Management decisions"],
     problem: "Teams needed a consistent view of operational and financial performance.",
     did: "Developed centralized Power BI and Metabase dashboards and standardized the KPI logic behind them.",
     outcome: "End-to-end business visibility and faster management decision-making.",
+    baseline: "KPIs lived in several separate Excel trackers, which was inconvenient for key managerial personnel (KMPs).",
     visual: { type: "dash" },
   },
   {
@@ -47,12 +51,13 @@ const cases = [
     tab: "AI voice bot pilot",
     tag: "Product thinking · Operations",
     title: "A 0-to-1 AI voice bot pilot for inbound leads",
-    hero: ["0", "3,000+"],
+    hero: [null, "3,000+"],
     label: "daily inbound leads qualified",
     flow: ["Inbound lead", "Voice bot qualifies", "Queue + priority", "CRM handoff"],
     problem: "A high volume of inbound leads needed qualifying and routing.",
     did: "Drove the Greylabs AI voice bot pilot and optimized auto-dialer workflows by defining queue management, prioritization and CRM handoffs.",
     outcome: "A pilot qualifying 3,000+ daily inbound leads.",
+    baseline: "The ABM team manually called each person to qualify them as a lead, which cost more.",
     visual: { type: "stream", from: "Inbound leads", to: "CRM", n: 3000, suffix: "+", cap: "daily inbound leads" },
   },
   {
@@ -67,6 +72,7 @@ const cases = [
     problem: "The Series-A fundraise needed clear company-level financial and operational metrics behind the story told to investors.",
     did: "Spearheaded company-level financial and operational metric analysis supporting the fundraise.",
     outcome: "Contributing critical insights for investor pitch decks and due diligence while the round is in progress.",
+    baseline: "Not shareable.",
     visual: { type: "dash" },
   },
   {
@@ -74,26 +80,20 @@ const cases = [
     tab: "RM allocation",
     tag: "Revenue operations · Lead allocation",
     title: "Allocating leads to relationship managers across India",
-    hero: [null, "India-wide"],
-    label: "RM allocation logic owned",
+    hero: [null, "+30%"],
+    label: "revenue vs before the new RM allocation logic",
     flow: ["Incoming lead", "Entity type, revenue, GWP", "RM allocation", "Relationship coverage"],
     problem: "Leads, including offline RM-assisted journeys, needed to reach the right relationship manager.",
     did: "Owned RM allocation logic across India, assigning leads by entity type, revenue and GWP, and defined LSQ activity tracking for offline RM-assisted journeys.",
-    outcome: "Optimized relationship coverage across India.",
+    outcome: "More selling, and 30% more revenue than before.",
+    baseline: "Leads were assigned round-robin, so leads from potential clients often went to freshers.",
     visual: { type: "route" },
-  },
-  {
-    id: "upi",
-    tab: "UPI dashboard",
-    tag: "Project · Data cleaning & reporting",
-    title: "UPI Transaction Analytics Dashboard",
-    hero: ["Raw", "Reliable"],
-    label: "Excel · SQL · VLOOKUP · XLOOKUP",
-    flow: ["Raw UPI data", "Clean + transform", "Reconcile sources", "Interactive dashboard"],
-    problem: "Raw transaction data from multiple sources needed a trustworthy base for performance reporting.",
-    did: "Cleaned and transformed the data with Advanced Excel and SQL, and integrated multi-source datasets to streamline reconciliation.",
-    outcome: "An interactive dashboard tracking payment trends, revenue and business KPIs.",
-    visual: { type: "dash" },
+    memo: [
+      ["Before", "Round-robin: potential clients' leads went to freshers"],
+      ["Criteria", "Entity type · Revenue · GWP"],
+      ["Decision", "Assign each lead to an RM on those criteria, across India"],
+      ["Result", "30% more revenue than before"],
+    ],
   },
 ];
 
@@ -187,6 +187,13 @@ export default function Cases() {
           </div>
           <p className="hm-label">{c.label}</p>
           <Vis v={c.visual} />
+          {c.memo && (
+            <dl className="memo">
+              {c.memo.map(([k, v]) => (
+                <div key={k}><dt>{k}</dt><dd className={v.startsWith("[") ? "ph" : ""}>{v}</dd></div>
+              ))}
+            </dl>
+          )}
           <ol className="flow">
             {c.flow.map((f, n) => (
               <li key={f} style={{ "--d": `${n * 0.9}s` }}>{f}</li>
@@ -194,9 +201,9 @@ export default function Cases() {
           </ol>
         </div>
         <dl className="case-notes">
-          <div><dt>Problem</dt><dd>{c.problem}</dd></div>
-          <div><dt>What I did</dt><dd>{c.did}</dd></div>
-          <div><dt>Outcome</dt><dd>{c.outcome}</dd></div>
+          {[["Problem", c.problem], ["Baseline", c.baseline], ["What I did", c.did], ["Outcome", c.outcome], ["What I’d improve", c.next]].filter(([, v]) => v).map(([k, v]) => (
+            <div key={k}><dt>{k}</dt><dd className={v.startsWith("[") ? "ph" : ""}>{v}</dd></div>
+          ))}
         </dl>
       </article>
     </div>

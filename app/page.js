@@ -1,6 +1,5 @@
 import Nav from "../components/Nav";
 import DataField from "../components/DataField";
-import Rotator from "../components/Rotator";
 import Counter from "../components/Counter";
 import Marquee from "../components/Marquee";
 import Story from "../components/Story";
@@ -43,15 +42,25 @@ export default function Home() {
             <p className="lead rv" style={{ "--d": ".55s" }}>
               Building data-driven systems that turn complex business problems into actionable decisions.
             </p>
-            <div className="rv" style={{ "--d": ".7s" }}><Rotator /></div>
+            <ul className="proof rv" style={{ "--d": ".7s" }} aria-label="Results at a glance">
+              <li><strong>~2 days → ~5 min</strong><span>cohort analysis</span></li>
+              <li><strong>90,000+</strong><span>policies migrated</span></li>
+              <li><strong>3,000+</strong><span>daily leads, AI voice bot pilot</span></li>
+              <li><strong>+30% revenue</strong><span>from RM allocation logic</span></li>
+            </ul>
             <p className="sub rv" style={{ "--d": ".85s" }}>
               Business Analyst (Product &amp; Analytics) at BimaKavach. MCA in Data Science, pivoting into Product Management,
               Product Analytics and Business Intelligence.
             </p>
             <div className="actions rv" style={{ "--d": "1s" }}>
               <a className="btn btn-primary" href="#work"><span>See the work</span></a>
-              <a className="btn btn-secondary" href="#contact"><span>Get in touch</span></a>
+              <a className="btn btn-secondary" href="/Biswajit-Saha-Resume.pdf" download><span>Download resume (PDF)</span></a>
             </div>
+            <p className="hero-contact rv" style={{ "--d": "1.1s" }}>
+              <a href="mailto:biswajit2001june@gmail.com">biswajit2001june@gmail.com</a>
+              <span aria-hidden="true">·</span>
+              <a href="https://www.linkedin.com/in/biswajit-saha-72681b1a0/" target="_blank" rel="noreferrer">LinkedIn ↗</a>
+            </p>
           </div>
           <div className="hero-vis rv" style={{ "--d": ".4s" }}>
             <DataField />
@@ -73,8 +82,8 @@ export default function Home() {
             <p className="k-l">Policies migrated across ~40 data points</p>
           </div>
           <div className="kpi glow" data-reveal style={{ "--d": ".2s" }}>
-            <p className="k-v"><strong><Counter to={3000} suffix="+" /></strong></p>
-            <p className="k-l">Daily inbound leads in the AI voice bot pilot</p>
+            <p className="k-v"><strong><Counter to={30} prefix="+" suffix="%" /></strong></p>
+            <p className="k-l">Revenue vs before, from the RM allocation logic</p>
           </div>
           <div className="kpi glow" data-reveal style={{ "--d": ".3s" }}>
             <p className="k-v"><strong><Counter to={100} prefix="Rs. " suffix=" Cr" /></strong></p>
@@ -117,6 +126,14 @@ export default function Home() {
               </li>
             ))}
           </ol>
+          <div className="measure glow" data-reveal>
+            <p className="overline">How I&rsquo;d measure it · illustrative framing, not a result</p>
+            <div className="measure-grid">
+              <div><b>North-star</b><p>GWP from leads that reach an RM, per allocated lead</p></div>
+              <div><b>Counter-metric</b><p>RM response time and coverage, so a high-value rule doesn&rsquo;t starve smaller leads</p></div>
+              <div><b>Funnel</b><p>Lead → assigned → contacted → qualified → converted</p></div>
+            </div>
+          </div>
         </section>
 
         <section id="skills" className="sec">
@@ -141,8 +158,8 @@ export default function Home() {
                 <li>Drove a 0-to-1 Greylabs <b>AI voice bot pilot qualifying 3,000+ daily inbound leads</b>; optimized auto-dialer workflows with queue management, prioritization and CRM handoffs.</li>
                 <li>Led company-level financial and operational metric analysis supporting the <b>Rs. 100 Cr Series-A fundraise (in progress)</b>, with insights for investor pitch decks and due diligence.</li>
                 <li>Engineered an automated client cohort analysis framework: <b>~2 days to ~5 minutes</b>. Formulated customer segmentation strategies to evaluate cross-sell and upsell performance.</li>
-                <li>Led the end-to-end <b>migration of 90,000+ policies</b> across ~40 data points to Vaatun, restructuring architectures for 12K direct and 40K partner clients to enable RCA-ready reporting.</li>
-                <li>Defined LSQ activity tracking for offline RM-assisted journeys; owned <b>RM allocation logic across India</b> (entity type, revenue, GWP).</li>
+                <li>Led the end-to-end <b>migration of 90,000+ policies</b> across ~40 data points to a new system, restructuring architectures for 12K direct and 40K partner clients to enable RCA-ready reporting.</li>
+                <li>Defined LSQ activity tracking for offline RM-assisted journeys; owned <b>RM allocation logic across India</b> (entity type, revenue, GWP), which delivered <b>30% more revenue than before</b>.</li>
                 <li>Developed centralized <b>Power BI and Metabase dashboards</b> tracking operational and financial KPIs, standardizing logic for faster management decisions.</li>
               </ul>
             </div>
@@ -154,16 +171,11 @@ export default function Home() {
             <p className="sec-k">06 · Projects</p>
             <h2>Also <em>built</em></h2>
           </div>
-          <div className="mini">
+          <div className="mini one">
             <div className="glow" data-reveal>
               <span className="overline">Python · HuggingFace · LangChain · Gradio</span>
               <b>SmartShelf — semantic book recommender</b>
               <p>AI recommendation engine mapping user emotional cues to book embeddings across 10k+ titles. Top-5 precision up 12+ pts in offline evals; median latency under 300ms.</p>
-            </div>
-            <div className="glow" data-reveal style={{ "--d": ".1s" }}>
-              <span className="overline">Excel · SQL · VLOOKUP · XLOOKUP</span>
-              <b>UPI Transaction Analytics Dashboard</b>
-              <p>Cleaned and transformed raw UPI transaction data, integrated multi-source datasets to streamline reconciliation, and built an interactive dashboard for payment trends, revenue and business KPIs.</p>
             </div>
           </div>
         </section>
@@ -193,27 +205,29 @@ export default function Home() {
             <h2>Positions of <em>responsibility</em></h2>
             <p className="sec-sub">Where I coordinated, mentored and organized, beyond the analysis itself.</p>
           </div>
-          <div className="lead-cards">
-            <article className="lcard glow" data-reveal>
-              <span className="overline">Position of responsibility · Presidency College</span>
-              <p className="lstat num-m">Head</p>
-              <h3>Cybersecurity Society</h3>
-              <p>Coordinated DSA-IT Club activities and organized technical workshops covering industry-standard cybersecurity tools.</p>
-            </article>
-            <article className="lcard glow" data-reveal style={{ "--d": ".1s" }}>
+          <article className="lfeature glow" data-reveal>
+            <div>
               <span className="overline">Event leadership · Northeast India</span>
-              <p className="lstat num-m"><Counter to={5} suffix="+" /><small>years</small></p>
+              <p className="lstat num-l"><Counter to={5} suffix="+" /><small>years mentoring</small></p>
+            </div>
+            <div>
               <h3>Mentoring &amp; Technophilia</h3>
               <p>Mentored students for 5+ years at Northeast India&rsquo;s largest interschool IT fest and conceptualized Technophilia, an inter-university IT fest.</p>
-            </article>
-            <article className="lcard glow" data-reveal style={{ "--d": ".2s" }}>
-              <span className="overline">Achievement · TryHackMe</span>
-              <p className="lstat num-m"><Counter to={2} prefix="Top " suffix="%" /><small>globally</small></p>
-              <h3>Hands-on security labs</h3>
+            </div>
+          </article>
+          <ul className="also" data-reveal>
+            <li>
+              <span className="overline">Also · Presidency College</span>
+              <b>Head, Cybersecurity Society</b>
+              <p>Coordinated DSA-IT Club activities and organized technical workshops covering industry-standard cybersecurity tools.</p>
+            </li>
+            <li>
+              <span className="overline">Also · TryHackMe</span>
+              <b>Top 2% globally</b>
               <p>Completed advanced hands-on security labs across web security, networking, and privilege escalation.</p>
               <a className="lcard-link" href="https://tryhackme.com/p/biswa.bug" target="_blank" rel="noreferrer">View TryHackMe profile ↗</a>
-            </article>
-          </div>
+            </li>
+          </ul>
         </section>
 
         <section id="contact" className="contact">
@@ -222,13 +236,14 @@ export default function Home() {
           <div className="actions" data-reveal>
             <a className="btn btn-primary btn-lg" href="mailto:biswajit2001june@gmail.com"><span>biswajit2001june@gmail.com</span></a>
             <a className="btn btn-secondary btn-lg" href="https://www.linkedin.com/in/biswajit-saha-72681b1a0/" target="_blank" rel="noreferrer"><span>LinkedIn ↗</span></a>
+            <a className="btn btn-secondary btn-lg" href="/Biswajit-Saha-Resume.pdf" download><span>Resume (PDF)</span></a>
           </div>
         </section>
       </main>
 
       <footer className="foot">
         <span>© {new Date().getFullYear()} Biswajit Saha</span>
-        <a href="#top">Back to top ↑</a>
+        <span className="foot-links"><a href="/Biswajit-Saha-Resume.pdf" download>Resume (PDF)</a><a href="#top">Back to top ↑</a></span>
       </footer>
     </>
   );

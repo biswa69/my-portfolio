@@ -2,14 +2,21 @@ import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Preloader from "../components/Preloader";
 import Effects from "../components/Effects";
+import ProtoBanner from "../components/ProtoBanner";
 
 const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-display", axes: ["wdth", "opsz"] });
 const body = DM_Sans({ subsets: ["latin"], variable: "--font-body" });
 
+const title = "Biswajit Saha — Data × Product × Business";
+const description =
+  "Business Analyst (Product & Analytics). Building data-driven systems that turn complex business problems into actionable decisions.";
+
 export const metadata = {
-  title: "Biswajit Saha — Data × Product × Business",
-  description:
-    "Business Analyst (Product & Analytics). Building data-driven systems that turn complex business problems into actionable decisions.",
+  metadataBase: new URL("https://biswajit-data-product.vercel.app"),
+  title,
+  description,
+  openGraph: { title, description, type: "website", siteName: "Biswajit Saha" },
+  twitter: { card: "summary_large_image", title, description },
 };
 
 // Runs before first paint: theme (stored or system) + whether to skip the intro.
@@ -24,6 +31,7 @@ export default function RootLayout({ children }) {
       <body>
         <Preloader />
         <Effects />
+        <ProtoBanner />
         {children}
       </body>
     </html>
