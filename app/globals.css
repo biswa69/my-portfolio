@@ -82,8 +82,18 @@ html.seen .preloader { display: none; }
 .pre-bar.b1 { fill: var(--a2); }
 .pre-bar.b2 { fill: var(--ink); opacity: .55; }
 .pre-line { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; transition: opacity .4s; }
-.pre-row { display: flex; justify-content: space-between; margin: var(--s5) 0 var(--s2); color: var(--muted); }
-.pre-pct { color: var(--ink); font-variant-numeric: tabular-nums; }
+.pre-meter { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s5); margin: var(--s5) 0 var(--s4); text-align: left; }
+.odo { display: inline-flex; align-items: flex-start; height: 1em; font-family: var(--font-display), sans-serif; font-weight: 700; font-size: 72px; line-height: 1; letter-spacing: -.04em; color: var(--ink); }
+.odo-d { display: block; width: .6em; height: 1em; overflow: hidden; }
+.odo-strip { display: flex; flex-direction: column; transform: translateY(calc(var(--d) * -1em)); transition: transform .5s cubic-bezier(.2,.8,.2,1); }
+.odo-strip i { display: block; height: 1em; font-style: normal; text-align: center; }
+.odo-pct { align-self: flex-end; margin: 0 0 .12em .08em; font-size: .38em; letter-spacing: 0; color: var(--muted); }
+.pre-stages { list-style: none; display: grid; gap: var(--s1); font-size: 14px; line-height: 20px; }
+.pre-stages li { display: flex; align-items: center; gap: var(--s2); color: var(--muted); transition: color .3s; }
+.pre-stages li.now, .pre-stages li.done { color: var(--ink); }
+.pre-stages b { flex: none; display: grid; place-items: center; width: 16px; height: 16px; border: 1.5px solid var(--line); border-radius: 4px; font-size: 11px; line-height: 1; font-weight: 700; transition: background .25s, border-color .25s; }
+.pre-stages li.now b { border-color: var(--a1); animation: blink 1s ease-in-out infinite; }
+.pre-stages li.done b { background: var(--ink); border-color: var(--ink); color: var(--ink-inv); }
 .pre-track { height: 4px; background: var(--line); border-radius: 4px; overflow: hidden; }
 .pre-track i { display: block; height: 100%; transform-origin: 0 50%; background: var(--a1); }
 .pre-name { font-family: var(--font-display), sans-serif; font-weight: 700; font-size: 32px; letter-spacing: -.02em; margin-top: var(--s6); }
