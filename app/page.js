@@ -6,6 +6,7 @@ import Marquee from "../components/Marquee";
 import Story from "../components/Story";
 import Cases from "../components/Cases";
 import Skills from "../components/Skills";
+import Timeline from "../components/Timeline";
 
 const chain = [
   { k: "User", v: "Leads and clients, including offline RM-assisted journeys" },
@@ -134,7 +135,7 @@ export default function Home() {
           </div>
           <div className="timeline">
             <div className="role glow" data-reveal>
-              <div className="when">Nov 2025 – Present</div>
+              <div className="overline">Nov 2025 – Present</div>
               <h3>Business Analyst (Product &amp; Analytics) <small>BimaKavach · Bengaluru</small></h3>
               <ul>
                 <li>Drove a 0-to-1 Greylabs <b>AI voice bot pilot qualifying 3,000+ daily inbound leads</b>; optimized auto-dialer workflows with queue management, prioritization and CRM handoffs.</li>
@@ -145,32 +146,77 @@ export default function Home() {
                 <li>Developed centralized <b>Power BI and Metabase dashboards</b> tracking operational and financial KPIs, standardizing logic for faster management decisions.</li>
               </ul>
             </div>
-            <div className="role glow" data-reveal>
-              <div className="when">Nov 2023 – Nov 2025</div>
-              <h3>MCA, Data Science <small>Presidency College (Autonomous) · Bengaluru</small></h3>
-            </div>
-            <div className="role glow" data-reveal>
-              <div className="when">Oct 2019 – Oct 2022</div>
-              <h3>BCA <small>Royal Global University · Guwahati</small></h3>
-            </div>
           </div>
+        </section>
 
+        <section id="projects" className="sec">
+          <div className="sec-head" data-reveal>
+            <p className="sec-k">06 · Projects</p>
+            <h2>Also <em>built</em></h2>
+          </div>
           <div className="mini">
             <div className="glow" data-reveal>
-              <span className="tag">Project</span>
+              <span className="overline">Python · HuggingFace · LangChain · Gradio</span>
               <b>SmartShelf — semantic book recommender</b>
-              <p>AI recommendation engine mapping user emotional cues to book embeddings across 10k+ titles. Top-5 precision up 12+ pts in offline evals; median latency under 300ms. Python, HuggingFace, LangChain, Gradio.</p>
+              <p>AI recommendation engine mapping user emotional cues to book embeddings across 10k+ titles. Top-5 precision up 12+ pts in offline evals; median latency under 300ms.</p>
             </div>
             <div className="glow" data-reveal style={{ "--d": ".1s" }}>
-              <span className="tag">Leadership</span>
-              <b>Mentoring &amp; event leadership</b>
-              <p>Mentored students for 5+ years at Northeast India&rsquo;s largest interschool IT fest and conceptualized Technophilia, an inter-university IT fest.</p>
+              <span className="overline">Excel · SQL · VLOOKUP · XLOOKUP</span>
+              <b>UPI Transaction Analytics Dashboard</b>
+              <p>Cleaned and transformed raw UPI transaction data, integrated multi-source datasets to streamline reconciliation, and built an interactive dashboard for payment trends, revenue and business KPIs.</p>
             </div>
           </div>
         </section>
 
+        <section id="education" className="sec">
+          <div className="sec-head" data-reveal>
+            <p className="sec-k">07 · Education</p>
+            <h2>Study and work, <em>to scale</em></h2>
+            <p className="sec-sub">One timeline from 2019 to today, drawn from the dates on my resume.</p>
+          </div>
+          <Timeline />
+          <div className="edu-grid">
+            <div className="role glow" data-reveal>
+              <div className="overline">Nov 2023 – Nov 2025</div>
+              <h3>Master of Computer Application, Data Science <small>Presidency College (Autonomous) · Bengaluru, India</small></h3>
+            </div>
+            <div className="role glow" data-reveal style={{ "--d": ".1s" }}>
+              <div className="overline">Oct 2019 – Oct 2022</div>
+              <h3>Bachelor of Computer Application <small>Royal Global University · Guwahati, India</small></h3>
+            </div>
+          </div>
+        </section>
+
+        <section id="leadership" className="sec">
+          <div className="sec-head" data-reveal>
+            <p className="sec-k">08 · Leadership</p>
+            <h2>Positions of <em>responsibility</em></h2>
+            <p className="sec-sub">Where I coordinated, mentored and organized, beyond the analysis itself.</p>
+          </div>
+          <div className="lead-cards">
+            <article className="lcard glow" data-reveal>
+              <span className="overline">Position of responsibility · Presidency College</span>
+              <p className="lstat num-m">Head</p>
+              <h3>Cybersecurity Society</h3>
+              <p>Coordinated DSA-IT Club activities and organized technical workshops covering industry-standard cybersecurity tools.</p>
+            </article>
+            <article className="lcard glow" data-reveal style={{ "--d": ".1s" }}>
+              <span className="overline">Event leadership · Northeast India</span>
+              <p className="lstat num-m"><Counter to={5} suffix="+" /><small>years</small></p>
+              <h3>Mentoring &amp; Technophilia</h3>
+              <p>Mentored students for 5+ years at Northeast India&rsquo;s largest interschool IT fest and conceptualized Technophilia, an inter-university IT fest.</p>
+            </article>
+            <article className="lcard glow" data-reveal style={{ "--d": ".2s" }}>
+              <span className="overline">Achievement · TryHackMe</span>
+              <p className="lstat num-m"><Counter to={2} prefix="Top " suffix="%" /><small>globally</small></p>
+              <h3>Hands-on security labs</h3>
+              <p>Completed advanced hands-on security labs across web security, networking, and privilege escalation.</p>
+            </article>
+          </div>
+        </section>
+
         <section id="contact" className="contact">
-          <p className="sec-k" data-reveal>06 · Contact</p>
+          <p className="sec-k" data-reveal>09 · Contact</p>
           <h2 data-reveal>Let&rsquo;s turn your data into <em>decisions.</em></h2>
           <div className="actions" data-reveal>
             <a className="btn btn-primary btn-lg" href="mailto:biswajit2001june@gmail.com"><span>biswajit2001june@gmail.com</span></a>
