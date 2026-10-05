@@ -211,6 +211,7 @@ export default function Home() {
               <p className="lstat num-m"><Counter to={2} prefix="Top " suffix="%" /><small>globally</small></p>
               <h3>Hands-on security labs</h3>
               <p>Completed advanced hands-on security labs across web security, networking, and privilege escalation.</p>
+              <a className="lcard-link" href="https://tryhackme.com/p/biswa.bug" target="_blank" rel="noreferrer">View TryHackMe profile ↗</a>
             </article>
           </div>
         </section>
