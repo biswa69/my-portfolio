@@ -2,7 +2,6 @@ import { Bricolage_Grotesque, DM_Sans } from "next/font/google";
 import "./globals.css";
 import Preloader from "../components/Preloader";
 import Effects from "../components/Effects";
-import ProtoBanner from "../components/ProtoBanner";
 
 const display = Bricolage_Grotesque({ subsets: ["latin"], variable: "--font-display", axes: ["wdth", "opsz"] });
 const body = DM_Sans({ subsets: ["latin"], variable: "--font-body" });
@@ -31,7 +30,6 @@ export default function RootLayout({ children }) {
       <body>
         <Preloader />
         <Effects />
-        <ProtoBanner />
         {children}
       </body>
     </html>
