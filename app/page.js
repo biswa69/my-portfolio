@@ -5,7 +5,6 @@ import Marquee from "../components/Marquee";
 import Story from "../components/Story";
 import Cases from "../components/Cases";
 import Skills from "../components/Skills";
-import Timeline from "../components/Timeline";
 
 const chain = [
   { k: "User", v: "Leads and clients, including offline RM-assisted journeys" },
@@ -180,28 +179,9 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="education" className="sec">
-          <div className="sec-head" data-reveal>
-            <p className="sec-k">07 · Education</p>
-            <h2>Study and work, <em>to scale</em></h2>
-            <p className="sec-sub">One timeline from 2019 to today, drawn from the dates on my resume.</p>
-          </div>
-          <Timeline />
-          <div className="edu-grid">
-            <div className="role glow" data-reveal>
-              <div className="overline">Nov 2023 – Nov 2025</div>
-              <h3>Master of Computer Application, Data Science <small>Presidency College (Autonomous) · Bengaluru, India</small></h3>
-            </div>
-            <div className="role glow" data-reveal style={{ "--d": ".1s" }}>
-              <div className="overline">Oct 2019 – Oct 2022</div>
-              <h3>Bachelor of Computer Application <small>Royal Global University · Guwahati, India</small></h3>
-            </div>
-          </div>
-        </section>
-
         <section id="leadership" className="sec">
           <div className="sec-head" data-reveal>
-            <p className="sec-k">08 · Leadership</p>
+            <p className="sec-k">07 · Leadership</p>
             <h2>Positions of <em>responsibility</em></h2>
             <p className="sec-sub">Where I coordinated, mentored and organized, beyond the analysis itself.</p>
           </div>
@@ -231,7 +211,7 @@ export default function Home() {
         </section>
 
         <section id="contact" className="contact">
-          <p className="sec-k" data-reveal>09 · Contact</p>
+          <p className="sec-k" data-reveal>08 · Contact</p>
           <h2 data-reveal>Let&rsquo;s turn your data into <em>decisions.</em></h2>
           <div className="actions" data-reveal>
             <a className="btn btn-primary btn-lg" href="mailto:biswajit2001june@gmail.com"><span>biswajit2001june@gmail.com</span></a>

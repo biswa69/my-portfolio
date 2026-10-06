@@ -55,7 +55,7 @@ h1, h2, h3, .display, .brand, .num-l, .num-m, .k-v strong, .race-kpi .k-v strong
 .sec-sub { font-size: 20px; line-height: 1.4; color: var(--muted); max-width: 56ch; margin-top: var(--s4); }
 .sub, .scard p, .case-notes dd, .role ul, .mini p, .eco-detail p { font-size: 16px; line-height: 1.5; }
 .small, .k-l, .hm-label, .field-cap, .eco-foot, .foot, .chain p, .stream-n span, .scard-f span, .chip, .flow li, .node, .vis.race > div, .pre-row, .role h3 small { font-size: 14px; line-height: 1.43; }
-.overline, .tl-name, .eyebrow, .sec-k, .scard-k, .tag, .case-notes dt, .eco-k, .when, .pre-tag, .story-n { font-family: var(--font-body), sans-serif; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.overline, .eyebrow, .sec-k, .scard-k, .tag, .case-notes dt, .eco-k, .when, .pre-tag, .story-n { font-family: var(--font-body), sans-serif; font-size: 12px; line-height: 16px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
 .t-label, .btn, .seg button, .nav nav a, .field-chip, .chip, .flow li, .node { font-weight: 600; }
 
 /* ---------- scroll progress + ambient ---------- */
@@ -367,22 +367,6 @@ h2 em { color: var(--a1); }
 .mini > div { padding: var(--s5); border-radius: var(--r3); display: flex; flex-direction: column; gap: var(--s2); }
 .mini p { color: var(--muted); }
 
-/* education: timeline to scale */
-.tl { --tl-name: 72px; margin-bottom: var(--s4); padding: var(--s5); border: 1px solid var(--line); border-radius: var(--r3); background: var(--card); }
-.tl-grid { display: grid; gap: var(--s3); }
-.tl-axis { position: relative; height: 24px; margin-left: var(--tl-name); border-bottom: 1px solid var(--line); }
-.tl-axis span { position: absolute; bottom: var(--s1); font-size: 12px; line-height: 16px; font-weight: 600; color: var(--muted); padding-left: var(--s1); border-left: 1px solid var(--line); }
-.tl-row { display: grid; grid-template-columns: var(--tl-name) 1fr; align-items: center; }
-.tl-lane { position: relative; height: 48px; }
-.tl-bar { position: absolute; top: 0; bottom: 0; left: var(--s); width: var(--w); display: flex; align-items: center; padding: 0 var(--s3); border-radius: var(--r1); background: var(--ink); color: var(--ink-inv); font-size: 14px; line-height: 20px; font-weight: 600; overflow: hidden; white-space: nowrap; transform: scaleX(0); transform-origin: left; transition: transform .9s var(--ease); transition-delay: calc(var(--i) * .25s + .2s); }
-.tl.in .tl-bar { transform: scaleX(1); }
-.tl-bar.work { background: var(--a1); color: var(--on-a1); }
-.tl-legend { list-style: none; display: grid; gap: var(--s2); margin-top: var(--s5); font-size: 14px; line-height: 20px; color: var(--muted); }
-.tl-legend li { display: flex; align-items: center; gap: var(--s3); }
-.tl-legend i { flex: none; width: 12px; height: 12px; border-radius: 4px; background: var(--ink); }
-.tl-legend i.work { background: var(--a1); }
-.edu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s4); }
-
 /* leadership */
 .lead-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--s4); }
 .lcard { padding: var(--s5); display: flex; flex-direction: column; gap: var(--s3); min-height: 288px; }
@@ -457,7 +441,7 @@ h2 em { color: var(--a1); }
   .story-stick { position: sticky; top: var(--s9); z-index: 5; height: auto; gap: var(--s3); padding: var(--s3) var(--s4) var(--s3) var(--s5); background: color-mix(in srgb, var(--bg) 84%, transparent); backdrop-filter: blur(12px); border-radius: var(--r2); border: 1px solid var(--line); }
   .story-w { font-size: 32px; } .story-rail { left: 8px; top: 12px; bottom: 12px; }
   .scard { min-height: 256px; padding: var(--s5); }
-  .case, .eco, .mini, .edu-grid, .lead-cards { grid-template-columns: 1fr; }
+  .case, .eco, .mini, .lead-cards { grid-template-columns: 1fr; }
   .lfeature, .also, .measure-grid { grid-template-columns: 1fr; }
   .memo > div { grid-template-columns: 1fr; gap: var(--s1); }
   .lcard { min-height: 0; }
@@ -468,7 +452,6 @@ h2 em { color: var(--a1); }
   .nav nav { display: none; }
   .contact { padding: var(--s9) 0 var(--s8); }
 }
-@media (max-width: 640px) { .tl { --tl-name: 56px; padding: var(--s4); } .tl-bar b { display: none; } }
 @media (max-width: 520px) { .nav-resume { display: none; } .proof { grid-template-columns: 1fr; } .chain, .kpis { grid-template-columns: 1fr; } .btn-lg { width: 100%; } }
 
 @media (prefers-reduced-motion: reduce) {
