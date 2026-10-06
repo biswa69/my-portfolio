@@ -69,69 +69,24 @@ h1, h2, h3, .display, .brand, .num-l, .num-m, .k-v strong, .race-kpi .k-v strong
 .ambient i:nth-child(3) { display: none; }
 @keyframes drift { from { transform: translate3d(0,0,0) scale(1); } to { transform: translate3d(5vw, 4vw, 0) scale(1.18); } }
 
-/* ---------- preloader ---------- */
-.preloader { position: fixed; inset: 0; z-index: 200; background: var(--bg); display: grid; place-items: center; cursor: pointer; transition: clip-path 1s cubic-bezier(.76,0,.24,1); clip-path: inset(0 0 0 0); }
+/* ---------- preloader: a name and one drawing line, then a curtain lifts ---------- */
+.preloader { position: fixed; inset: 0; z-index: 200; background: var(--bg); display: grid; place-items: center; cursor: pointer; border-bottom: 1px solid var(--line); transition: transform .85s cubic-bezier(.85,0,.15,1); }
 html.seen .preloader { display: none; }
-.preloader.out { clip-path: inset(0 0 100% 0); }
-.pre-inner { width: min(440px, calc(100% - 48px)); text-align: center; transition: opacity .35s, transform .6s; }
-.preloader.out .pre-inner { opacity: 0; transform: translateY(-24px); }
-.pre-tag { margin-bottom: var(--s5); }
-.pre-meter { display: flex; align-items: center; justify-content: space-between; gap: var(--s5); margin: var(--s5) 0 var(--s4); text-align: left; }
-.odo { display: inline-flex; align-items: flex-start; height: 1em; font-family: var(--font-display), sans-serif; font-weight: 700; font-size: 72px; line-height: 1; letter-spacing: -.04em; color: var(--ink); }
-.odo-d { display: block; width: .6em; height: 1em; overflow: hidden; }
-.odo-strip { display: flex; flex-direction: column; transform: translateY(calc(var(--d) * -1em)); transition: transform .5s cubic-bezier(.2,.8,.2,1); }
-.odo-strip i { display: block; height: 1em; font-style: normal; text-align: center; }
-.odo-pct { align-self: flex-end; margin: 0 0 .12em .08em; font-size: .38em; letter-spacing: 0; color: var(--muted); }
-.pre-drum { height: 72px; min-width: 196px; overflow: hidden; text-align: left; -webkit-mask-image: linear-gradient(transparent, #000 32%, #000 68%, transparent); mask-image: linear-gradient(transparent, #000 32%, #000 68%, transparent); }
-.pre-drum ul { list-style: none; transition: transform .55s cubic-bezier(.2,.8,.2,1); }
-.pre-drum li { height: 24px; font-size: 14px; line-height: 24px; font-weight: 600; color: var(--muted); opacity: .3; transition: opacity .4s, color .4s; white-space: nowrap; }
-.pre-drum li.near { opacity: .55; }
-.pre-drum li.now { color: var(--ink); opacity: 1; }
-.pre-track { height: 4px; background: var(--line); border-radius: 4px; overflow: hidden; }
-.pre-track i { display: block; height: 100%; transform-origin: 0 50%; background: var(--a1); }
-.pre-name { font-family: var(--font-display), sans-serif; font-weight: 700; font-size: 32px; letter-spacing: -.02em; margin-top: var(--s6); }
-.pre-scene { display: block; width: 100%; height: auto; overflow: visible; }
-.pre-ground { stroke: var(--line); stroke-width: 2; stroke-linecap: round; }
-.pbar { transform-box: fill-box; transform-origin: 50% 100%; transform: scaleY(0); opacity: 0; }
-.pbar.on { transform: scaleY(1); opacity: 1; transition: transform .55s cubic-bezier(.34,1.56,.64,1), opacity .2s; }
-.pbar.c0 { fill: var(--a1); } .pbar.c1 { fill: var(--a2); } .pbar.c2 { fill: var(--ink); opacity: 0; } .pbar.c2.on { opacity: .55; }
-.ptrend { fill: none; stroke: var(--ink); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 260; stroke-dashoffset: 260; transition: stroke-dashoffset .8s ease; }
-.ptrend.on { stroke-dashoffset: 0; }
-
-/* the analyst */
-.ch-move { transition: transform .18s linear; }
-.ch-body, .ch-leg { fill: var(--ink); }
-.ch-ant { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; }
-.ch-led { fill: var(--a1); animation: blink 1.2s ease-in-out infinite; }
-.ch-led.ok { animation: none; fill: var(--a3); }
-.ch-face { fill: var(--bg); }
-.ch-eye { fill: var(--ink); }
-.ch-eyes { transition: transform .12s ease-out; }
-.ch-mouth { fill: none; stroke: var(--ink); stroke-width: 2; stroke-linecap: round; transition: d .2s; }
-.ch-badge { fill: var(--a1); }
-.ch-limb { stroke: var(--ink); stroke-width: 6; stroke-linecap: round; }
-.ch-clip { fill: var(--bg); stroke: var(--ink); stroke-width: 2; }
-.ch-clip-line { stroke: var(--muted); stroke-width: 1.5; stroke-linecap: round; }
-.ch-leg { transform-box: fill-box; transform-origin: 50% 0; }
-.walking .ch-leg.l { animation: stepL .28s ease-in-out infinite alternate; }
-.walking .ch-leg.r { animation: stepL .28s ease-in-out infinite alternate-reverse; }
-@keyframes stepL { from { transform: rotate(20deg); } to { transform: rotate(-20deg); } }
-.ch-idle { animation: bob 1.6s ease-in-out infinite; }
-@keyframes bob { 50% { transform: translateY(-2px); } }
-.ch-hop { animation: hop .55s cubic-bezier(.3,.9,.4,1); }
-@keyframes hop { 40% { transform: translateY(-24px); } }
-.ch-arm { transition: transform .3s var(--ease); }
-.arm-walk { animation: swing .28s ease-in-out infinite alternate; }
-@keyframes swing { from { transform: rotate(35deg); } to { transform: rotate(-10deg); } }
-.arm-work { animation: tap .5s ease-in-out infinite alternate; }
-@keyframes tap { from { transform: rotate(-32deg); } to { transform: rotate(-4deg); } }
-.arm-up { transform: rotate(-118deg); }
-.ch-say rect, .ch-say path { fill: var(--bg2); stroke: var(--line); stroke-width: 1; animation: sayin .3s var(--ease) both; }
-.ch-say path { stroke: none; }
-.ch-say text { fill: var(--ink); font-size: 12px; font-weight: 600; font-family: var(--font-body), sans-serif; animation: sayin .3s var(--ease) both; }
-@keyframes sayin { from { opacity: 0; } to { opacity: 1; } }
-.pre-skip { display: flex; align-items: center; justify-content: center; gap: var(--s3); margin-top: var(--s2); font-size: 12px; color: var(--muted); }
-.pre-skip button { font-size: 12px; font-weight: 600; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; padding: var(--s1) var(--s2); }
+.preloader.out { transform: translateY(-100%); }
+.pre-tag { position: absolute; top: var(--s5); left: var(--gutter); }
+.pre-main { width: min(1100px, calc(100% - 2 * var(--gutter))); }
+.pre-name { font-size: clamp(48px, 9vw, 112px); line-height: .95; letter-spacing: -.04em; margin-bottom: var(--s6); }
+.pre-line { display: block; overflow: hidden; padding-bottom: .08em; }
+.pre-line > span { display: block; transform: translateY(110%); animation: nameUp .9s cubic-bezier(.2,.9,.2,1) .12s forwards; }
+@keyframes nameUp { to { transform: none; } }
+.pre-trend { position: relative; height: 88px; }
+.pre-trend svg { display: block; width: 100%; height: 100%; overflow: visible; }
+.pre-base { stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.pre-area { fill: color-mix(in srgb, var(--a1) 12%, transparent); stroke: none; }
+.pre-path { fill: none; stroke: var(--a1); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.pre-dot { position: absolute; width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: var(--a1); box-shadow: 0 0 0 6px color-mix(in srgb, var(--a1) 22%, transparent); }
+.pre-foot { position: absolute; left: var(--gutter); right: var(--gutter); bottom: var(--s5); display: flex; justify-content: space-between; align-items: baseline; font-size: 12px; line-height: 16px; color: var(--muted); }
+.pre-pct { font-family: var(--font-display), sans-serif; font-size: 16px; line-height: 24px; font-weight: 700; color: var(--ink); font-variant-numeric: tabular-nums; }
 
 /* ---------- buttons ----------
    Primary   : solid accent. One per region. (hero "See the work", contact e-mail)
@@ -162,7 +117,7 @@ html.seen .preloader { display: none; }
 html[data-scrolled] .nav { background: color-mix(in srgb, var(--bg) 78%, transparent); backdrop-filter: blur(16px) saturate(1.4); border-color: var(--line); box-shadow: var(--shadow); }
 .brand { display: flex; align-items: center; gap: var(--s3); font-size: 16px; letter-spacing: -.02em; }
 .logo { display: block; width: 24px; height: 24px; overflow: visible; cursor: pointer; }
-.lg { opacity: 0; transform: scale(.5) rotate(-30deg); transform-box: view-box; transform-origin: 12px 12px; transition: opacity .35s, transform .6s cubic-bezier(.34,1.56,.64,1); }
+.lg { opacity: 0; transform: scale(.5) rotate(-30deg); transform-box: view-box; transform-origin: 12px 12px; transition: opacity .22s, transform .38s cubic-bezier(.34,1.56,.64,1); }
 .lg.on { opacity: 1; transform: none; }
 .lg rect, .lg circle { fill: var(--ink); stroke: none; }
 .lg polyline, .lg line { fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }

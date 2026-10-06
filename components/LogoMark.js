@@ -13,7 +13,7 @@ export default function LogoMark() {
   const start = () => {
     clearInterval(timer.current);
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    timer.current = setInterval(() => setI((n) => (n + 1) % KINDS.length), 2400);
+    timer.current = setInterval(() => setI((n) => (n + 1) % KINDS.length), 1100);
   };
 
   useEffect(() => {
