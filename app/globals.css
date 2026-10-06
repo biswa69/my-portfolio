@@ -161,10 +161,14 @@ html.seen .preloader { display: none; }
 .nav { position: fixed; top: var(--s4); left: 50%; transform: translateX(-50%); width: min(var(--maxw), calc(100% - 32px)); z-index: 60; display: flex; align-items: center; justify-content: space-between; gap: var(--s4); padding: var(--s2) var(--s2) var(--s2) var(--s5); border-radius: var(--rp); border: 1px solid transparent; transition: background .3s, border-color .3s, backdrop-filter .3s, box-shadow .3s; }
 html[data-scrolled] .nav { background: color-mix(in srgb, var(--bg) 78%, transparent); backdrop-filter: blur(16px) saturate(1.4); border-color: var(--line); box-shadow: var(--shadow); }
 .brand { display: flex; align-items: center; gap: var(--s3); font-size: 16px; letter-spacing: -.02em; }
-.logo { display: flex; align-items: flex-end; gap: 2px; height: 16px; }
-.logo i { width: 4px; border-radius: 2px; background: var(--ink); animation: eq 1.6s ease-in-out infinite; transform-origin: bottom; }
-.logo i:nth-child(1) { height: 55%; } .logo i:nth-child(2) { height: 100%; animation-delay: -.5s; } .logo i:nth-child(3) { height: 75%; animation-delay: -1s; }
-@keyframes eq { 50% { transform: scaleY(.55); } }
+.logo { display: block; width: 24px; height: 24px; overflow: visible; cursor: pointer; }
+.lg { opacity: 0; transform: scale(.5) rotate(-30deg); transform-box: view-box; transform-origin: 12px 12px; transition: opacity .35s, transform .6s cubic-bezier(.34,1.56,.64,1); }
+.lg.on { opacity: 1; transform: none; }
+.lg rect, .lg circle { fill: var(--ink); stroke: none; }
+.lg polyline, .lg line { fill: none; stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.lg circle[stroke-dasharray] { fill: none; stroke: var(--ink); }
+.lg .acc { fill: var(--a1); }
+.lg circle.acc-s { fill: none; stroke: var(--a1); }
 .nav nav { display: flex; gap: var(--s1); font-size: 14px; }
 .nav nav a { padding: var(--s2) var(--s3); border-radius: var(--rp); color: var(--muted); text-decoration: underline; text-decoration-color: transparent; text-decoration-thickness: 2px; text-underline-offset: 6px; transition: color .2s, text-decoration-color .2s; }
 .nav nav a:hover { color: var(--ink); text-decoration-color: var(--line); }

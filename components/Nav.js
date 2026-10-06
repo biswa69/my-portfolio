@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import ThemeToggle from "./ThemeToggle";
+import LogoMark from "./LogoMark";
 
 const links = [
   ["story", "Story"],
@@ -25,7 +26,7 @@ export default function Nav() {
   return (
     <header className="nav">
       <a href="#top" className="brand">
-        <span className="logo" aria-hidden="true"><i /><i /><i /></span>
+        <LogoMark />
         Biswajit Saha
       </a>
       <nav aria-label="Primary">
