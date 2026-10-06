@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 
-// The loader is a name and one line. The line is a rising trend that draws itself left to right,
+// The loader is one line. The line is a rising trend that draws itself left to right,
 // and it is also the progress bar. About 1.3s, then a curtain lifts to reveal the page.
 const DURATION = 1250;
 const smooth = (t) => t * t * (3 - 2 * t); // slow start, quick middle, soft landing
@@ -79,10 +79,6 @@ export default function Preloader() {
     >
       <p className="pre-tag">DATA × PRODUCT × BUSINESS</p>
       <div className="pre-main">
-        <h2 className="pre-name" aria-label="Biswajit Saha">
-          <span className="pre-line" aria-hidden="true"><span>Biswajit</span></span>
-          <span className="pre-line" aria-hidden="true"><span style={{ animationDelay: ".28s" }}>Saha</span></span>
-        </h2>
         <div className="pre-trend" aria-hidden="true">
           <svg viewBox="0 0 1000 80" preserveAspectRatio="none">
             <line className="pre-base" x1="0" y1="79" x2="1000" y2="79" />

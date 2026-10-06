@@ -69,16 +69,12 @@ h1, h2, h3, .display, .brand, .num-l, .num-m, .k-v strong, .race-kpi .k-v strong
 .ambient i:nth-child(3) { display: none; }
 @keyframes drift { from { transform: translate3d(0,0,0) scale(1); } to { transform: translate3d(5vw, 4vw, 0) scale(1.18); } }
 
-/* ---------- preloader: a name and one drawing line, then a curtain lifts ---------- */
+/* ---------- preloader: one drawing line, then a curtain lifts ---------- */
 .preloader { position: fixed; inset: 0; z-index: 200; background: var(--bg); display: grid; place-items: center; cursor: pointer; border-bottom: 1px solid var(--line); transition: transform .85s cubic-bezier(.85,0,.15,1); }
 html.seen .preloader { display: none; }
 .preloader.out { transform: translateY(-100%); }
 .pre-tag { position: absolute; top: var(--s5); left: var(--gutter); }
 .pre-main { width: min(1100px, calc(100% - 2 * var(--gutter))); }
-.pre-name { font-size: clamp(48px, 9vw, 112px); line-height: .95; letter-spacing: -.04em; margin-bottom: var(--s6); }
-.pre-line { display: block; overflow: hidden; padding-bottom: .08em; }
-.pre-line > span { display: block; transform: translateY(110%); animation: nameUp .9s cubic-bezier(.2,.9,.2,1) .12s forwards; }
-@keyframes nameUp { to { transform: none; } }
 .pre-trend { position: relative; height: 88px; }
 .pre-trend svg { display: block; width: 100%; height: 100%; overflow: visible; }
 .pre-base { stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; }
