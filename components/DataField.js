@@ -344,11 +344,19 @@ export default function DataField() {
       schedule();
     };
 
-    // A click on a view button hands control to the visitor for good.
+    // Picking a view, by click or by hovering its button, hands control to the visitor for good.
     api.current.choose = (id) => {
       auto = false;
-      go(id);
+      clearTimeout(cycle);
+      if (id !== cur) go(id);
     };
+    // Hovering a button shows its view after a short pause, so sweeping across the row does not thrash the dots.
+    let hoverTimer;
+    api.current.preview = (id) => {
+      clearTimeout(hoverTimer);
+      hoverTimer = setTimeout(() => api.current.choose(id), 90);
+    };
+    api.current.cancel = () => clearTimeout(hoverTimer);
 
     const loop = () => {
       if (visible && !document.hidden) draw();
@@ -381,7 +389,7 @@ export default function DataField() {
     // Sort itself out shortly after the intro lifts, then keep cycling through the shapes.
     const d = document.documentElement;
     let timer;
-    const kick = () => { timer = setTimeout(() => go("trend"), reduce ? 0 : 1500); };
+    const kick = () => { timer = setTimeout(() => { if (auto) go("trend"); }, reduce ? 0 : 1500); };
     let ready;
     if (d.classList.contains("ready")) kick();
     else {
@@ -393,6 +401,7 @@ export default function DataField() {
       cancelAnimationFrame(raf);
       clearTimeout(timer);
       clearTimeout(cycle);
+      clearTimeout(hoverTimer);
       ro.disconnect();
       io.disconnect();
       theme.disconnect();
@@ -410,10 +419,18 @@ export default function DataField() {
       </div>
       <div className="seg field-ctl" role="group" aria-label="Data view">
         {VIEWS.map((v) => (
-          <button key={v.id} aria-pressed={view === v.id} onClick={() => api.current.choose?.(v.id)}>{v.label}</button>
+          <button
+            key={v.id}
+            aria-pressed={view === v.id}
+            onClick={() => api.current.choose?.(v.id)}
+            onPointerEnter={(e) => { if (e.pointerType === "mouse") api.current.preview?.(v.id); }}
+            onPointerLeave={() => api.current.cancel?.()}
+          >
+            {v.label}
+          </button>
         ))}
       </div>
-      <p className="field-cap">Illustrative data. Move your cursor through it, or pick a view.</p>
+      <p className="field-cap">Illustrative data. Hover a view, or move your cursor through the dots.</p>
     </div>
   );
 }
