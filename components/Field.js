@@ -5,6 +5,7 @@ import { N, SHAPES, COLORS } from "../lib/shapes";
 // One canvas, fixed behind the page, with N dots on springs. `shape` names the formation (lib/shapes.js).
 // The dots move; nothing else on the page does. Hover pushes them aside, except on shapes that read the cursor.
 // `focus` lets the text pick the highlighted group; `onFocus` tells the text which group the field is highlighting.
+// `flip` puts the field on the left, for a chapter whose text sits on the right; the dots then fly across to their new side.
 
 const SPRING = 38; // pull toward the target
 const DAMP = 9; // a few percent overshoot, then settle in about 0.7s
@@ -12,7 +13,7 @@ const PUSH = 2800; // how hard the cursor pushes dots away
 const HI = COLORS.hi;
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
-export default function Field({ shape, focus = null, onFocus }) {
+export default function Field({ shape, flip = false, focus = null, onFocus }) {
   const ref = useRef(null);
   const api = useRef(null);
   const focusRef = useRef(focus);
@@ -42,6 +43,7 @@ export default function Field({ shape, focus = null, onFocus }) {
     let shapeStart = now;
     let lastFocus;
     let jitter = false;
+    let flipped = false; // false: the field is right of the text; true: left of it
     let labels = [];
     let timers = [];
     let dead = false;
@@ -91,7 +93,16 @@ export default function Field({ shape, focus = null, onFocus }) {
       }
     };
 
-    const show = (id, instant = false) => {
+    // When the field changes sides, the dots whose place is nearest the side they are heading for set off first,
+    // so the flock streams across instead of lurching.
+    const sweep = (b) => {
+      for (const p of b.pts) {
+        const lead = flipped ? p.x - region.x0 : region.x1 - p.x;
+        p.delay = (p.delay || 0) + clamp(lead / region.w, 0, 1) * 0.3;
+      }
+    };
+
+    const show = (id, instant = false, turned = false) => {
       const def = SHAPES[id];
       if (!def || !region) return;
       timers.forEach(clearTimeout);
@@ -105,7 +116,9 @@ export default function Field({ shape, focus = null, onFocus }) {
         return;
       }
       cv.dataset.phase = "0";
-      apply(def.build(region, 0), instant);
+      const first = def.build(region, 0);
+      if (turned && !instant) sweep(first);
+      apply(first, instant);
       def.phases.forEach((at, i) =>
         timers.push(
           setTimeout(() => {
@@ -117,6 +130,21 @@ export default function Field({ shape, focus = null, onFocus }) {
       );
     };
 
+    // Where the dots may go: the part of the page the text column leaves free. The three numbers repeat --pad, --col and
+    // --gap in globals.css, so the text and the field always sit side by side; change them together.
+    const setRegion = () => {
+      const cw = document.documentElement.clientWidth || W; // the page lays out beside the scrollbar
+      const pad = clamp(W * 0.046, 48, 88);
+      const col = clamp(W * 0.42, 400, 820);
+      const gap = clamp(W * 0.046, 40, 96);
+      const x0 = Math.round(flipped ? pad : pad + col + gap);
+      const x1 = Math.round(flipped ? cw - pad - col - gap : cw - pad);
+      const y0 = Math.round(Math.max(112, H * 0.16));
+      const y1 = Math.round(H - Math.max(68, H * 0.11));
+      region = { W, H, u: clamp(W / 1280, 0.85, 1.5), x0, x1, y0, y1, w: x1 - x0, h: y1 - y0, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 };
+      st.region = region;
+    };
+
     const size = () => {
       dpr = Math.min(devicePixelRatio || 1, 2);
       W = innerWidth;
@@ -124,12 +152,7 @@ export default function Field({ shape, focus = null, onFocus }) {
       cv.width = Math.round(W * dpr);
       cv.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const x0 = Math.round(W * 0.42);
-      const x1 = Math.round(W * 0.955);
-      const y0 = Math.round(Math.max(112, H * 0.16));
-      const y1 = Math.round(H - Math.max(68, H * 0.11));
-      region = { W, H, u: clamp(W / 1280, 0.85, 1.5), x0, x1, y0, y1, w: x1 - x0, h: y1 - y0, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 };
-      st.region = region;
+      setRegion();
       if (!placed) {
         // first paint: every dot starts at the centre of the field and bursts out to its place
         placed = true;
@@ -240,7 +263,14 @@ export default function Field({ shape, focus = null, onFocus }) {
     addEventListener("resize", size);
     addEventListener("pointermove", onMove, { passive: true });
     document.documentElement.addEventListener("pointerleave", onLeave);
-    api.current = { show };
+    api.current = {
+      show: (id, f = false) => {
+        const turned = f !== flipped;
+        flipped = f;
+        if (turned) setRegion();
+        show(id, false, turned);
+      },
+    };
     next(frame);
 
     return () => {
@@ -253,8 +283,8 @@ export default function Field({ shape, focus = null, onFocus }) {
   }, []);
 
   useEffect(() => {
-    api.current?.show(shape);
-  }, [shape]);
+    api.current?.show(shape, flip);
+  }, [shape, flip]);
 
   return <canvas ref={ref} className="field" aria-hidden="true" />;
 }

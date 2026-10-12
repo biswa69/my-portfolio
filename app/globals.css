@@ -1,7 +1,7 @@
 /* =====================================================================
    Dark only. Five colours, two type families, one easing curve.
    Colour means one thing: everything is quiet or bone until it matters, and the one thing
-   that matters on screen is the highlighter. Dots do the moving; text never fades in.
+   that matters on screen is the highlighter. Dots do the moving; text stays put and only fades in and out.
    ===================================================================== */
 
 :root {
@@ -15,8 +15,14 @@
   --t1: 150ms; /* hover */
   --t2: 450ms; /* colour and state */
 
-  --pad: clamp(32px, 4.2vw, 80px);
-  --col: clamp(380px, 33vw, 580px);
+  /* Layout: the text takes a column and the dots take the rest, side by side, and on every other chapter they swap sides.
+     components/Field.js repeats --pad, --col and --gap to work out where the dots may go, so change them together. */
+  --pad: clamp(48px, 4.6vw, 88px);
+  --col: clamp(400px, 42vw, 820px);
+  --gap: clamp(40px, 4.6vw, 96px);
+  /* One step of type size: 1px up to a 1280 x 720 window, then it grows with the window to 1.3px, but never faster
+     than the window's height allows, so a chapter's text still fits on one screen. */
+  --u: clamp(1px, min(0.078125vw, 0.138889vh), 1.3px);
   --sans: var(--font-sans), system-ui, -apple-system, "Segoe UI", sans-serif;
   --mono: var(--font-mono), ui-monospace, Consolas, monospace;
 }
@@ -91,7 +97,7 @@ main { position: relative; z-index: 1; }
 
 .rail {
   position: fixed;
-  right: 22px;
+  right: 14px;
   top: 50%;
   transform: translateY(-50%);
   z-index: 20;
@@ -109,13 +115,14 @@ main { position: relative; z-index: 1; }
   font: 500 11.5px/1 var(--mono);
   color: var(--quiet);
 }
-.rail a span { opacity: 0; transform: translateX(6px); transition: opacity var(--t2) var(--ease), transform var(--t2) var(--ease); pointer-events: none; }
+.rail a span { padding: 3px 6px; background: var(--ink); opacity: 0; transform: translateX(6px); transition: opacity var(--t2) var(--ease), transform var(--t2) var(--ease); pointer-events: none; }
 .rail a:hover span, .rail a:focus-visible span { opacity: 1; transform: none; color: var(--bone); }
 .rail a i { display: block; width: 14px; height: 2px; background: var(--rule); transition: width var(--t2) var(--ease), background var(--t2) var(--ease); }
 .rail a:hover i { background: var(--quiet); }
 .rail a.on i { width: 28px; background: var(--hi); }
 
 /* ---- chapters ---------------------------------------------------- */
+/* Without the script a chapter is a plain screen of text, one after the other. */
 .ch {
   --fg: var(--quiet);
   --num: var(--quiet);
@@ -125,31 +132,85 @@ main { position: relative; z-index: 1; }
   padding: 104px var(--pad) 72px;
 }
 .ch.on { --fg: var(--bone); --num: var(--hi); }
-.ch-in { width: var(--col); }
-.ch :where(h1, h2, p, dd, li, b) { transition: color var(--t2) var(--ease); }
+.ch.flip { justify-content: flex-end; } /* text on the right, dots on the left */
+.ch-in { flex: none; width: var(--col); text-shadow: 0 0 5px var(--ink), 0 0 12px var(--ink); }
+
+/* Slides. Once the script runs the text does not scroll. Each chapter owns --run of scroll, its text stays fixed in place, and
+   only the active chapter's is shown. Crossing into the next chapter lifts the old text away as the dots leave; the dots fly to
+   the other side; the new text rises in a moment later (--reveal), once they have cleared its side.
+   A chapter whose text is taller than the screen gets extra scroll, and its text rises through it (--shift, set by the script). */
+.gated { --run: 70vh; --reveal: 520ms; } /* keep equal to RUN and REVEAL in components/Showcase.js */
+.gated .ch { display: block; height: var(--run); min-height: 0; padding: 0; }
+.gated .ch.contact { height: 100vh; }
+.gated .ch-in {
+  position: fixed;
+  top: 104px;
+  bottom: 72px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  justify-content: safe center; /* a chapter taller than the box starts at the top instead of spilling out of both ends */
+  transform: translateY(calc(var(--shift, 0px) * -1));
+}
+.gated .ch:not(.flip) .ch-in { left: var(--pad); }
+.gated .ch.flip .ch-in { right: var(--pad); }
+.gated .ch:not(.on) .ch-in { pointer-events: none; }
+.gated .ch.on .ch-in { transition: transform 200ms linear; }
+
+/* Rising text. A chapter's text is made of "rv" blocks. Each block rises into place from its own bottom edge, as if through a
+   slot, the blocks following one another down the chapter; on the way out each lifts away through its top edge. The mask is the
+   block's own box (clip-path), moved in step with the block (same curve, same time), so nothing shows outside it.
+   A chapter that is not showing waits below the active one (next) or above it (past), so the motion follows the scroll: going down
+   the page the new text comes up from below, going back up it comes down from above. */
+.gated .rv {
+  --delay: calc(var(--reveal) + min(var(--i, 0), 9) * 40ms);
+  transition: transform 220ms cubic-bezier(0.4, 0, 0.6, 1), clip-path 220ms cubic-bezier(0.4, 0, 0.6, 1), color var(--t2) var(--ease);
+}
+.gated .ch.next .rv { transform: translateY(100%); clip-path: inset(0 0 100% 0); }
+.gated .ch.past .rv { transform: translateY(-100%); clip-path: inset(100% 0 0 0); }
+.gated .ch.on .rv {
+  transform: none;
+  clip-path: inset(-16px -24px -16px -24px); /* room for focus rings and the descenders of the name */
+  transition: transform 640ms var(--ease) var(--delay), clip-path 640ms var(--ease) var(--delay), color var(--t2) var(--ease);
+}
+.ch :where(h1, h2, p, dd, li, b, em) { transition: color var(--t2) var(--ease); }
 .ch a { color: var(--fg); }
 .ch a:hover { color: var(--hi); }
 
-.k { font: 500 12px/1.5 var(--mono); color: var(--quiet); letter-spacing: 0.02em; }
+.k { font: 500 calc(12 * var(--u))/1.5 var(--mono); color: var(--quiet); letter-spacing: 0.02em; }
 
 /* intro */
+.eyebrow { display: flex; flex-wrap: wrap; gap: 0 calc(10 * var(--u)); margin-bottom: calc(16 * var(--u)); font: 500 calc(12 * var(--u))/1.5 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--quiet); }
+.eyebrow b { font-weight: 500; color: var(--fg); }
+.eyebrow i { font-style: normal; }
 .name {
-  font-size: min(clamp(52px, 7vw, 116px), calc(var(--col) / 4.7));
+  font-size: min(clamp(52px, 7.2vw, 150px), calc(var(--col) / 4.7));
   font-weight: 800;
   letter-spacing: -0.04em;
   line-height: 0.92;
   color: var(--fg);
+  text-shadow: none; /* the halo would smear between letters that overlap by their negative tracking */
 }
-.name span { display: block; }
-.role { margin-top: 30px; font-size: clamp(18px, 1.5vw, 22px); font-weight: 500; line-height: 1.35; color: var(--fg); }
-.lede { margin-top: 10px; max-width: 34ch; color: var(--fg); }
-.links { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 32px; font-size: 15.5px; }
+.name > span { display: block; }
+/* each letter answers the pointer: it turns to the highlighter and pinches in, as if the typeface's width were squeezed */
+.lt { position: relative; display: inline-block; cursor: default; transition: font-variation-settings 380ms var(--ease), color 220ms var(--ease); }
+.lt::after { content: ""; position: absolute; top: 0; bottom: 0; left: -0.1em; right: -0.1em; } /* keeps the hover steady while the letter narrows */
+.lt:hover { color: var(--hi); font-variation-settings: "wdth" 72; }
+.lead { margin-top: calc(22 * var(--u)); font-size: calc(23 * var(--u)); font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; color: var(--fg); }
+.proof { display: grid; grid-template-columns: 1fr 1fr; gap: calc(14 * var(--u)) calc(24 * var(--u)); margin-top: calc(22 * var(--u)); }
+.proof li { padding-left: calc(14 * var(--u)); border-left: 1px solid var(--rule); }
+.proof b { display: block; font-size: calc(23 * var(--u)); font-weight: 800; letter-spacing: -0.02em; line-height: 1.15; white-space: nowrap; color: var(--fg); }
+.proof b i { margin: 0 0.1em; font-style: normal; font-weight: 600; color: var(--quiet); }
+.proof b em { font-style: normal; color: var(--num); }
+.proof span { display: block; margin-top: calc(2 * var(--u)); font: 500 calc(12 * var(--u))/1.5 var(--mono); color: var(--quiet); }
+.sub { margin-top: calc(18 * var(--u)); font-size: calc(15.5 * var(--u)); line-height: 1.55; color: var(--quiet); }
+.links { display: flex; flex-wrap: wrap; gap: 8px calc(24 * var(--u)); margin-top: calc(24 * var(--u)); font-size: calc(15.5 * var(--u)); }
 
 /* cases */
-.case-t { margin-top: 16px; font-size: clamp(25px, 2.45vw, 38px); font-weight: 800; letter-spacing: -0.025em; line-height: 1.1; color: var(--fg); }
+.case-t { margin-top: calc(16 * var(--u)); font-size: calc(35 * var(--u)); font-weight: 800; letter-spacing: -0.025em; line-height: 1.1; color: var(--fg); }
 .big {
-  margin-top: 26px;
-  font-size: min(clamp(60px, 7.2vw, 116px), calc(var(--col) / (var(--len) * 0.6)));
+  margin-top: calc(26 * var(--u));
+  font-size: min(calc(96 * var(--u)), calc(var(--col) / (var(--len) * 0.6)));
   font-weight: 800;
   letter-spacing: -0.045em;
   line-height: 1;
@@ -160,42 +221,42 @@ main { position: relative; z-index: 1; }
 .big s { font-size: 0.34em; letter-spacing: -0.02em; font-weight: 700; color: var(--quiet); text-decoration-thickness: 2px; }
 .big i { font-style: normal; font-size: 0.34em; color: var(--quiet); margin: 0 0.5em; vertical-align: 0.18em; }
 .big.stack { white-space: normal; }
-.big.stack s, .big.stack i { font-size: 17px; font-weight: 600; letter-spacing: 0; vertical-align: baseline; }
+.big.stack s, .big.stack i { font-size: calc(17 * var(--u)); font-weight: 600; letter-spacing: 0; vertical-align: baseline; }
 .big.stack i { margin: 0 0 0 0.6em; }
 .big.stack i::after { content: ""; display: block; height: 8px; }
-.big-l { margin-top: 6px; font: 500 12.5px/1.5 var(--mono); color: var(--quiet); }
+.big-l { margin-top: calc(6 * var(--u)); font: 500 calc(12.5 * var(--u))/1.5 var(--mono); color: var(--quiet); }
 
-.notes { margin-top: 30px; display: grid; gap: 13px; }
-.notes > div { display: grid; grid-template-columns: 124px 1fr; gap: 0 14px; }
-.notes dt { font: 500 12px/1.95 var(--mono); color: var(--quiet); }
-.notes dd { font-size: 15.5px; line-height: 1.5; color: var(--fg); }
-.measure { margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--rule); }
-.measure .notes { margin-top: 14px; }
+.notes { margin-top: calc(30 * var(--u)); display: grid; gap: calc(13 * var(--u)); }
+.notes > div { display: grid; grid-template-columns: calc(124 * var(--u)) 1fr; gap: 0 calc(14 * var(--u)); }
+.notes dt { font: 500 calc(12 * var(--u))/1.95 var(--mono); color: var(--quiet); }
+.notes dd { font-size: calc(15.5 * var(--u)); line-height: 1.5; color: var(--fg); }
+.measure { margin-top: calc(30 * var(--u)); padding-top: calc(18 * var(--u)); border-top: 1px solid var(--rule); }
+.measure .notes { margin-top: calc(14 * var(--u)); }
 
 /* elsewhere and contact */
-.sec-t { font-size: clamp(26px, 2.6vw, 40px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; color: var(--fg); }
-.els .sec-t { margin-top: 14px; }
-.body { margin-top: 20px; font-size: 16.5px; line-height: 1.55; color: var(--fg); }
-.also { display: block; margin-top: 14px; font: 500 12px/1.65 var(--mono); color: var(--quiet); }
-.hint { margin-top: 22px; font: 500 12px/1.65 var(--mono); color: var(--hi); }
-.exp { margin-top: 28px; font-size: 15.5px; line-height: 1.5; color: var(--fg); }
+.sec-t { font-size: calc(34 * var(--u)); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; color: var(--fg); }
+.els .sec-t { margin-top: calc(14 * var(--u)); }
+.body { margin-top: calc(20 * var(--u)); font-size: calc(16.5 * var(--u)); line-height: 1.55; color: var(--fg); }
+.also { display: block; margin-top: calc(14 * var(--u)); font: 500 calc(12 * var(--u))/1.65 var(--mono); color: var(--quiet); }
+.hint { margin-top: calc(22 * var(--u)); font: 500 calc(12 * var(--u))/1.65 var(--mono); color: var(--hi); }
+.exp { margin-top: calc(28 * var(--u)); font-size: calc(15.5 * var(--u)); line-height: 1.5; color: var(--fg); }
 .exp b { font-weight: 600; }
 
 /* the skill list: pointing at a group lights its row in the matrix, and the matrix lights the list in turn */
-.sk { margin-top: 28px; }
-.sk li { margin-top: 18px; color: var(--quiet); outline-offset: 8px; transition: color var(--t2) var(--ease); }
+.sk { margin-top: calc(28 * var(--u)); }
+.sk li { margin-top: calc(18 * var(--u)); color: var(--quiet); outline-offset: 8px; transition: color var(--t2) var(--ease); }
 .sk li:first-child { margin-top: 0; }
-.sk li b { display: block; font-size: 19px; font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; transition: color var(--t2) var(--ease); }
-.sk li span { display: block; margin-top: 2px; font: 500 12px/1.6 var(--mono); }
+.sk li b { display: block; font-size: calc(19 * var(--u)); font-weight: 700; line-height: 1.3; letter-spacing: -0.01em; transition: color var(--t2) var(--ease); }
+.sk li span { display: block; margin-top: 2px; font: 500 calc(12 * var(--u))/1.6 var(--mono); }
 .sk li.on { color: var(--bone); }
 .sk li.on b { color: var(--hi); }
-.mail { display: inline-block; margin-top: 24px; font-size: clamp(22px, 2.1vw, 34px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; text-decoration-color: var(--rule); }
-.contact .links { margin-top: 22px; }
-.foot { margin-top: 64px; font: 500 12px/1.5 var(--mono); color: var(--quiet); }
+.mail { display: inline-block; margin-top: calc(24 * var(--u)); font-size: calc(28 * var(--u)); font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; text-decoration-color: var(--rule); }
+.contact .links { margin-top: calc(22 * var(--u)); }
+.foot { margin-top: calc(64 * var(--u)); font: 500 calc(12 * var(--u))/1.5 var(--mono); color: var(--quiet); }
 .foot a { color: var(--quiet); }
 
 /* ---- motion preferences ------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  *, *::before, *::after { transition-duration: 0.01ms !important; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; transition-delay: 0ms !important; }
 }
