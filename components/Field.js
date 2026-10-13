@@ -6,11 +6,14 @@ import { N, SHAPES, COLORS } from "../lib/shapes";
 // The dots move; nothing else on the page does. Hover pushes them aside, except on shapes that read the cursor.
 // `focus` lets the text pick the highlighted group; `onFocus` tells the text which group the field is highlighting.
 // `flip` puts the field on the left, for a chapter whose text sits on the right; the dots then fly across to their new side.
+// Drawing is kept cheap: each colour becomes its CSS string once, a frame is not redrawn when nothing in it has changed, and the
+// loop stops once the formation has settled (it starts again when the cursor comes near, or when the formation changes).
 
 const SPRING = 38; // pull toward the target
 const DAMP = 9; // a few percent overshoot, then settle in about 0.7s
 const PUSH = 2800; // how hard the cursor pushes dots away
 const HI = COLORS.hi;
+const TAU = 6.2832;
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 
 export default function Field({ shape, flip = false, focus = null, onFocus }) {
@@ -27,6 +30,7 @@ export default function Field({ shape, flip = false, focus = null, onFocus }) {
   }, [onFocus]);
 
   useEffect(() => {
+    if (!matchMedia("(min-width: 1024px)").matches) return; // a phone has no dots (see WIDE in Showcase.js)
     const cv = ref.current;
     const ctx = cv.getContext("2d");
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -48,6 +52,29 @@ export default function Field({ shape, flip = false, focus = null, onFocus }) {
     let timers = [];
     let dead = false;
     let placed = false;
+    let cw = 0; // the page's width beside the scrollbar; read once per resize, because reading it forces the page to lay out
+    let asleep = false; // the loop has stopped because nothing is moving
+    let quiet = 0; // frames in a row in which nothing moved
+    let forced = true; // the next frame must be drawn even if nothing moved (new size, new formation)
+    let wasMoving = true;
+    // A colour is turned into its CSS string once, not once per dot per frame.
+    const cssCache = new Map();
+    const cssOf = (key) => {
+      let s = cssCache.get(key);
+      if (s === undefined) {
+        if (cssCache.size > 2000) cssCache.clear();
+        cssCache.set(key, (s = `rgb(${key >> 16},${(key >> 8) & 255},${key & 255})`));
+      }
+      return s;
+    };
+    let last = performance.now();
+    const wake = () => {
+      quiet = 0;
+      if (!asleep) return;
+      asleep = false;
+      last = performance.now();
+      next(frame);
+    };
     const ptr = { x: -9999, y: -9999 };
     // what live shapes can read each frame (see the header of lib/shapes.js)
     // `sim` is time as the dots feel it: it only advances by the (capped) step of each frame, so anything driven by it
@@ -55,7 +82,7 @@ export default function Field({ shape, flip = false, focus = null, onFocus }) {
     const st = { t: 0, sim: 0, since: 0, ptr, region: null, reduce, propFocus: null, focus: null, geo: null, mono };
     const dots = Array.from({ length: N }, () => ({
       x: 0, y: 0, vx: 0, vy: 0, tx: 0, ty: 0,
-      c: COLORS.quiet.slice(), tc: COLORS.quiet, r: 1, tr: 1, r0: 1,
+      c: COLORS.quiet.slice(), tc: COLORS.quiet, r: 1, tr: 1, r0: 1, key: -1, css: "",
       wob: null, pend: null, until: 0, m: null,
     }));
 
@@ -86,11 +113,14 @@ export default function Field({ shape, flip = false, focus = null, onFocus }) {
           d.vx = 0;
           d.vy = 0;
           d.c = p.c.slice();
+          d.key = -1; // its colour is worked out again on the next frame
           d.r = d.tr;
           d.until = 0;
         } else if (p.delay) d.pend = { at: now + p.delay * 1000, p };
         else place(d, p);
       }
+      forced = true;
+      wake();
     };
 
     // When the field changes sides, the dots whose place is nearest the side they are heading for set off first,
@@ -133,7 +163,6 @@ export default function Field({ shape, flip = false, focus = null, onFocus }) {
     // Where the dots may go: the part of the page the text column leaves free. The three numbers repeat --pad, --col and
     // --gap in globals.css, so the text and the field always sit side by side; change them together.
     const setRegion = () => {
-      const cw = document.documentElement.clientWidth || W; // the page lays out beside the scrollbar
       const pad = clamp(W * 0.046, 48, 88);
       const col = clamp(W * 0.42, 400, 820);
       const gap = clamp(W * 0.046, 40, 96);
@@ -149,6 +178,7 @@ export default function Field({ shape, flip = false, focus = null, onFocus }) {
       dpr = Math.min(devicePixelRatio || 1, 2);
       W = innerWidth;
       H = innerHeight;
+      cw = document.documentElement.clientWidth || W; // the page lays out beside the scrollbar
       cv.width = Math.round(W * dpr);
       cv.height = Math.round(H * dpr);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
@@ -161,19 +191,51 @@ export default function Field({ shape, flip = false, focus = null, onFocus }) {
           d.y = region.cy + (Math.cos(i * 78.233) - 0.5) * 20;
         });
       }
+      forced = true;
       if (current) show(current, true);
+      wake();
     };
 
+    // The cursor can only move dots that are within its reach of the field, so a loop that has stopped wakes up only for that.
     const onMove = (e) => {
       ptr.x = e.clientX;
       ptr.y = e.clientY;
+      if (!region) return;
+      const R = 90 * region.u;
+      if (ptr.x > region.x0 - R && ptr.x < region.x1 + R && ptr.y > region.y0 - R && ptr.y < region.y1 + R) wake();
     };
     const onLeave = () => {
       ptr.x = -9999;
       ptr.y = -9999;
+      wake();
     };
 
-    let last = performance.now();
+    // Draws every dot, then the live shape's own drawing and the labels. A dot is one filled circle: the browser has a fast path
+    // for that, and it loses to nothing tried here (one path per colour, sprites).
+    const draw = (def) => {
+      ctx.clearRect(0, 0, W, H);
+      for (let i = 0; i < N; i++) {
+        const d = dots[i];
+        ctx.fillStyle = d.css;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.r, 0, TAU);
+        ctx.fill();
+      }
+      if (def && def.draw) def.draw(ctx, st, dots);
+      ctx.font = `${Math.round(11.5 * region.u)}px ${mono}`;
+      ctx.textBaseline = "alphabetic";
+      for (const l of labels) {
+        const a = clamp((now - l.at) / 450, 0, 1);
+        if (a <= 0) continue;
+        ctx.globalAlpha = a;
+        ctx.fillStyle = l.hi ? "#ffcf1f" : "#8b877e";
+        ctx.textAlign = l.align || "left";
+        ctx.fillText(l.t, l.x, l.y);
+      }
+      ctx.globalAlpha = 1;
+      ctx.textAlign = "left";
+    };
+
     const frame = () => {
       if (dead) return;
       now = performance.now();
@@ -197,12 +259,17 @@ export default function Field({ shape, flip = false, focus = null, onFocus }) {
       const push = !reduce && !(def && def.noPush);
       const R = 90 * region.u;
       const R2 = R * R;
-      ctx.clearRect(0, 0, W, H);
+      const kc = Math.min(1, dt * 7); // how quickly a colour follows its target
+      const kr = Math.min(1, dt * 6); // and a size
+      let moving = false; // some dot is still travelling, changing colour or size, flashing or waiting to start
       for (let i = 0; i < N; i++) {
         const d = dots[i];
-        if (d.pend && now >= d.pend.at) {
-          place(d, d.pend.p);
-          d.pend = null;
+        if (d.pend) {
+          moving = true;
+          if (now >= d.pend.at) {
+            place(d, d.pend.p);
+            d.pend = null;
+          }
         }
         let tx = d.tx;
         let ty = d.ty;
@@ -232,30 +299,57 @@ export default function Field({ shape, flip = false, focus = null, onFocus }) {
         d.vy += ay * dt;
         d.x += d.vx * dt;
         d.y += d.vy * dt;
-        const tc = now < d.until ? HI : d.tc;
-        const k = Math.min(1, dt * 7);
-        d.c[0] += (tc[0] - d.c[0]) * k;
-        d.c[1] += (tc[1] - d.c[1]) * k;
-        d.c[2] += (tc[2] - d.c[2]) * k;
-        d.r += (d.tr - d.r) * Math.min(1, dt * 6);
-        ctx.fillStyle = `rgb(${d.c[0] | 0},${d.c[1] | 0},${d.c[2] | 0})`;
-        ctx.beginPath();
-        ctx.arc(d.x, d.y, d.r, 0, 6.2832);
-        ctx.fill();
+        // colour and size follow their targets; a dot that has arrived is drawn in exactly its target colour and is left alone
+        const flash = now < d.until;
+        const tc = flash ? HI : d.tc;
+        const c = d.c;
+        if (d.key < 0 || c[0] !== tc[0] || c[1] !== tc[1] || c[2] !== tc[2]) {
+          c[0] += (tc[0] - c[0]) * kc;
+          c[1] += (tc[1] - c[1]) * kc;
+          c[2] += (tc[2] - c[2]) * kc;
+          let key;
+          if (Math.abs(tc[0] - c[0]) < 0.5 && Math.abs(tc[1] - c[1]) < 0.5 && Math.abs(tc[2] - c[2]) < 0.5) {
+            c[0] = tc[0];
+            c[1] = tc[1];
+            c[2] = tc[2];
+            key = (tc[0] << 16) | (tc[1] << 8) | tc[2];
+          } else {
+            moving = true;
+            key = ((c[0] | 0) << 16) | ((c[1] | 0) << 8) | (c[2] | 0);
+          }
+          if (key !== d.key) {
+            d.key = key;
+            d.css = cssOf(key);
+          }
+        }
+        if (d.r !== d.tr) {
+          d.r += (d.tr - d.r) * kr;
+          if (Math.abs(d.tr - d.r) < 0.01) d.r = d.tr;
+          else moving = true;
+        }
+        if (flash) moving = true;
+        if (!moving && (Math.abs(d.vx) > 0.5 || Math.abs(d.vy) > 0.5 || Math.abs(tx - d.x) > 0.02 || Math.abs(ty - d.y) > 0.02)) moving = true;
       }
-      if (def && def.draw) def.draw(ctx, st, dots);
-      ctx.font = `${Math.round(11.5 * region.u)}px ${mono}`;
-      ctx.textBaseline = "alphabetic";
+      // a canvas in which nothing has changed is left as it is; a shape with drawing of its own is never unchanged
+      const live = (jitter && !reduce) || !!(def && (def.draw || def.frame));
+      let fading = false;
       for (const l of labels) {
-        const a = clamp((now - l.at) / 450, 0, 1);
-        if (a <= 0) continue;
-        ctx.globalAlpha = a;
-        ctx.fillStyle = l.hi ? "#ffcf1f" : "#8b877e";
-        ctx.textAlign = l.align || "left";
-        ctx.fillText(l.t, l.x, l.y);
+        if (now < l.at + 450) {
+          fading = true;
+          break;
+        }
       }
-      ctx.globalAlpha = 1;
-      ctx.textAlign = "left";
+      if (moving || wasMoving || live || fading || forced) {
+        draw(def);
+        forced = false;
+        quiet = 0;
+      } else quiet++;
+      wasMoving = moving;
+      // nothing has moved for a moment: stop the loop (wake() starts it again)
+      if (quiet > 12 && !live) {
+        asleep = true;
+        return;
+      }
       next(frame);
     };
 

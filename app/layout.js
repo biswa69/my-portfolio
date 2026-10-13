@@ -17,12 +17,16 @@ export const metadata = {
   twitter: { card: "summary_large_image", title, description },
 };
 
+// the browser's own bar takes the page's colour on a phone
+export const viewport = { themeColor: "#0d0c0b", colorScheme: "dark" };
+
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`${sans.variable} ${mono.variable}`} suppressHydrationWarning>
       <head>
-        {/* sets the slide layout (see `.gated` in globals.css) before the first paint, so the page does not jump when the script loads */}
-        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('gated')" }} />
+        {/* sets the slide layout (see `.gated` in globals.css) before the first paint, so the page does not jump when the script loads;
+            below 1024px wide the page is one plain column and there is no slide layout (keep equal to WIDE in components/Showcase.js) */}
+        <script dangerouslySetInnerHTML={{ __html: "if(matchMedia('(min-width:1024px)').matches)document.documentElement.classList.add('gated')" }} />
       </head>
       <body>{children}</body>
     </html>

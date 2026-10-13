@@ -1,7 +1,7 @@
 /* =====================================================================
    Dark only. Five colours, two type families, one easing curve.
    Colour means one thing: everything is quiet or bone until it matters, and the one thing
-   that matters on screen is the highlighter. Dots do the moving; text stays put and only fades in and out.
+   that matters on screen is the highlighter. Dots do the moving; text stays put and only rises in and out.
    ===================================================================== */
 
 :root {
@@ -38,7 +38,6 @@ html {
 
 body {
   margin: 0;
-  min-width: 1024px; /* desktop first; phones are not designed for yet */
   background: var(--ink);
   color: var(--bone);
   font-family: var(--sans);
@@ -133,47 +132,56 @@ main { position: relative; z-index: 1; }
 }
 .ch.on { --fg: var(--bone); --num: var(--hi); }
 .ch.flip { justify-content: flex-end; } /* text on the right, dots on the left */
-.ch-in { flex: none; width: var(--col); text-shadow: 0 0 5px var(--ink), 0 0 12px var(--ink); }
+/* One glow, not two: with two blurred shadows the browser redraws the text too slowly while it rises, and the frame rate halves. */
+.ch-in { flex: none; width: var(--col); text-shadow: 0 0 8px var(--ink); }
 
-/* Slides. Once the script runs the text does not scroll. Each chapter owns --run of scroll, its text stays fixed in place, and
-   only the active chapter's is shown. Crossing into the next chapter lifts the old text away as the dots leave; the dots fly to
-   the other side; the new text rises in a moment later (--reveal), once they have cleared its side.
-   A chapter whose text is taller than the screen gets extra scroll, and its text rises through it (--shift, set by the script). */
-.gated { --run: 70vh; --reveal: 520ms; } /* keep equal to RUN and REVEAL in components/Showcase.js */
-.gated .ch { display: block; height: var(--run); min-height: 0; padding: 0; }
-.gated .ch.contact { height: 100vh; }
-.gated .ch-in {
-  position: fixed;
-  top: 104px;
-  bottom: 72px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  justify-content: safe center; /* a chapter taller than the box starts at the top instead of spilling out of both ends */
-  transform: translateY(calc(var(--shift, 0px) * -1));
-}
-.gated .ch:not(.flip) .ch-in { left: var(--pad); }
-.gated .ch.flip .ch-in { right: var(--pad); }
-.gated .ch:not(.on) .ch-in { pointer-events: none; }
-.gated .ch.on .ch-in { transition: transform 200ms linear; }
+/* The slide layout below is for windows at least 1024px wide (WIDE in components/Showcase.js is the same number). Narrower ones
+   get the plain column at the end of this file. */
+@media (min-width: 1024px) {
+  /* Slides. Once the script runs the text does not scroll. Each chapter owns --run of scroll, its text stays fixed in place, and
+     only the active chapter's is shown. Crossing into the next chapter lifts the old text away as the dots leave; the dots fly to
+     the other side; the new text rises in a moment later (--reveal), once they have cleared its side.
+     A chapter whose text is taller than the screen gets extra scroll, and its text rises through it (--shift, set by the script). */
+  .gated { --run: 70vh; --reveal: 520ms; } /* keep equal to RUN and REVEAL in components/Showcase.js */
+  .gated .ch { display: block; height: var(--run); min-height: 0; padding: 0; }
+  .gated .ch.contact { height: 100vh; }
+  .gated .ch { --fg: var(--bone); --num: var(--hi); } /* only one chapter's text shows at a time, so all of it is the bright colour */
+  .gated .ch-in {
+    position: fixed;
+    top: 104px;
+    bottom: 72px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-content: safe center; /* a chapter taller than the box starts at the top instead of spilling out of both ends */
+    transform: translateY(calc(var(--shift, 0px) * -1));
+  }
+  .gated .ch:not(.flip) .ch-in { left: var(--pad); }
+  .gated .ch.flip .ch-in { right: var(--pad); }
+  .gated .ch:not(.on) .ch-in { pointer-events: none; }
+  .gated .ch.on .ch-in { transition: transform 200ms linear; }
 
-/* Rising text. A chapter's text is made of "rv" blocks. Each block rises into place from its own bottom edge, as if through a
-   slot, the blocks following one another down the chapter; on the way out each lifts away through its top edge. The mask is the
-   block's own box (clip-path), moved in step with the block (same curve, same time), so nothing shows outside it.
-   A chapter that is not showing waits below the active one (next) or above it (past), so the motion follows the scroll: going down
-   the page the new text comes up from below, going back up it comes down from above. */
-.gated .rv {
-  --delay: calc(var(--reveal) + min(var(--i, 0), 9) * 40ms);
-  transition: transform 220ms cubic-bezier(0.4, 0, 0.6, 1), clip-path 220ms cubic-bezier(0.4, 0, 0.6, 1), color var(--t2) var(--ease);
+  /* Rising text. A chapter's text is made of "rv" blocks. Each block rises into place from its own bottom edge, as if through a
+     slot, the blocks following one another down the chapter; on the way out each lifts away through its top edge. The mask is the
+     block's own box (clip-path), moved in step with the block (same curve, same time), so nothing shows outside it.
+     A chapter that is not showing waits below the active one (next) or above it (past), so the motion follows the scroll: going down
+     the page the new text comes up from below, going back up it comes down from above. */
+  .gated .rv {
+    --delay: calc(var(--reveal) + min(var(--i, 0), 9) * 40ms);
+    transition: transform 220ms cubic-bezier(0.4, 0, 0.6, 1), clip-path 220ms cubic-bezier(0.4, 0, 0.6, 1);
+  }
+  .gated .ch.next .rv { transform: translateY(100%); clip-path: inset(0 0 100% 0); }
+  .gated .ch.past .rv { transform: translateY(-100%); clip-path: inset(100% 0 0 0); }
+  .gated .ch.on .rv {
+    transform: none;
+    clip-path: inset(-16px -24px -16px -24px); /* room for focus rings and the descenders of the name */
+    transition: transform 640ms var(--ease) var(--delay), clip-path 640ms var(--ease) var(--delay);
+  }
+  /* Nothing changes colour when a chapter takes over (see --fg above), so no colour is animated here: the only colour that eases is
+     a skill row lighting up when the dots point at it. */
+  .gated .sk li.rv { transition: transform 220ms cubic-bezier(0.4, 0, 0.6, 1), clip-path 220ms cubic-bezier(0.4, 0, 0.6, 1), color var(--t2) var(--ease); }
+  .gated .ch.on .sk li.rv { transition: transform 640ms var(--ease) var(--delay), clip-path 640ms var(--ease) var(--delay), color var(--t2) var(--ease); }
 }
-.gated .ch.next .rv { transform: translateY(100%); clip-path: inset(0 0 100% 0); }
-.gated .ch.past .rv { transform: translateY(-100%); clip-path: inset(100% 0 0 0); }
-.gated .ch.on .rv {
-  transform: none;
-  clip-path: inset(-16px -24px -16px -24px); /* room for focus rings and the descenders of the name */
-  transition: transform 640ms var(--ease) var(--delay), clip-path 640ms var(--ease) var(--delay), color var(--t2) var(--ease);
-}
-.ch :where(h1, h2, p, dd, li, b, em) { transition: color var(--t2) var(--ease); }
 .ch a { color: var(--fg); }
 .ch a:hover { color: var(--hi); }
 
@@ -254,6 +262,52 @@ main { position: relative; z-index: 1; }
 .contact .links { margin-top: calc(22 * var(--u)); }
 .foot { margin-top: calc(64 * var(--u)); font: 500 calc(12 * var(--u))/1.5 var(--mono); color: var(--quiet); }
 .foot a { color: var(--quiet); }
+
+/* ---- narrow screens ------------------------------------------------------------------------------------------------
+   A phone, or a window too narrow for the slides: one plain column that is read from top to bottom and scrolls like any other
+   page. No dots, no fixed text, no paging (components/Showcase.js leaves all of that off below 1024px), so it is also the light
+   version: no canvas and no animation loop. */
+@media (max-width: 1023px) {
+  :root { --pad: 20px; --col: min(calc(100vw - 40px), 640px); }
+  html { scroll-padding-top: 56px; } /* a link to a chapter lands it below the top bar */
+  .field, .rail { display: none; }
+
+  .nav { height: 52px; }
+  .nav .brand { font-size: 16px; }
+  .nav ul { gap: 20px; font-size: 14px; }
+  .nav ul li:nth-child(2) { display: none; } /* "Elsewhere": in one column there is nothing to skip over */
+  .nav ul a { display: inline-block; padding: 14px 0; } /* a target the size of a finger */
+
+  .ch { --fg: var(--bone); --num: var(--hi); display: block; min-height: 0; padding: 56px var(--pad); border-top: 1px solid var(--rule); }
+  .ch.intro { padding-top: 92px; border-top: 0; }
+  .ch.contact { padding-bottom: 88px; }
+  .ch-in { width: 100%; max-width: 640px; margin: 0 auto; container-type: inline-size; text-shadow: none; }
+
+  .eyebrow { margin-bottom: 14px; }
+  .name { font-size: min(18vw, 112px); font-size: min(21cqw, 112px); }
+  .lead { margin-top: 18px; font-size: 21px; }
+  .proof { grid-template-columns: 1fr; gap: 16px; margin-top: 22px; }
+  .proof b { font-size: 21px; white-space: normal; }
+  .sub { margin-top: 18px; font-size: 16px; }
+  .links { gap: 0 22px; margin-top: 12px; font-size: 16px; }
+  .links a { display: inline-block; padding: 10px 0; }
+
+  .case-t { font-size: min(7.4vw, 34px); }
+  .big { margin-top: 20px; font-size: min(72px, calc(var(--col) / (var(--len) * 0.64))); font-size: min(72px, calc(100cqw / (var(--len) * 0.64))); }
+  .notes { margin-top: 24px; gap: 16px; }
+  .notes > div { grid-template-columns: 1fr; gap: 2px 0; }
+  .notes dd { font-size: 16px; }
+
+  .sec-t { font-size: min(7.6vw, 34px); }
+  .body { font-size: 16.5px; }
+  .hint { display: none; } /* it talks about moving the cursor over the dots */
+  .sk li { margin-top: 20px; }
+  .mail { font-size: min(5.6vw, 24px); font-size: min(6.4cqw, 24px); overflow-wrap: anywhere; }
+  .foot { margin-top: 40px; }
+  .foot a { display: inline-block; padding: 8px 0; }
+
+  @media (min-width: 600px) { .proof { grid-template-columns: 1fr 1fr; } }
+}
 
 /* ---- motion preferences ------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
