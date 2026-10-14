@@ -10,6 +10,7 @@
   --quiet: #8b877e; /* 5.5:1 on ink */
   --bone: #ece8df; /* 16:1 on ink */
   --hi: #ffcf1f; /* 13:1 on ink */
+  --card: #171613; /* a shade lighter than ink: the surface of a chapter card on a phone */
 
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --t1: 150ms; /* hover */
@@ -120,6 +121,10 @@ main { position: relative; z-index: 1; }
 .rail a:hover i { background: var(--quiet); }
 .rail a.on i { width: 28px; background: var(--hi); }
 
+/* the marker at the top of each chapter is only used by the phone layout (see the narrow block at the end) */
+.sent { display: none; }
+.pile { display: contents; } /* the group of short chapters at the end takes no part in the layout on a computer */
+
 /* ---- chapters ---------------------------------------------------- */
 /* Without the script a chapter is a plain screen of text, one after the other. */
 .ch {
@@ -200,10 +205,6 @@ main { position: relative; z-index: 1; }
   text-shadow: none; /* the halo would smear between letters that overlap by their negative tracking */
 }
 .name > span { display: block; }
-/* each letter answers the pointer: it turns to the highlighter and pinches in, as if the typeface's width were squeezed */
-.lt { position: relative; display: inline-block; cursor: default; transition: font-variation-settings 380ms var(--ease), color 220ms var(--ease); }
-.lt::after { content: ""; position: absolute; top: 0; bottom: 0; left: -0.1em; right: -0.1em; } /* keeps the hover steady while the letter narrows */
-.lt:hover { color: var(--hi); font-variation-settings: "wdth" 72; }
 .lead { margin-top: calc(22 * var(--u)); font-size: calc(23 * var(--u)); font-weight: 600; line-height: 1.3; letter-spacing: -0.01em; color: var(--fg); }
 .proof { display: grid; grid-template-columns: 1fr 1fr; gap: calc(14 * var(--u)) calc(24 * var(--u)); margin-top: calc(22 * var(--u)); }
 .proof li { padding-left: calc(14 * var(--u)); border-left: 1px solid var(--rule); }
@@ -264,23 +265,48 @@ main { position: relative; z-index: 1; }
 .foot a { color: var(--quiet); }
 
 /* ---- narrow screens ------------------------------------------------------------------------------------------------
-   A phone, or a window too narrow for the slides: one plain column that is read from top to bottom and scrolls like any other
-   page. No dots, no fixed text, no paging (components/Showcase.js leaves all of that off below 1024px), so it is also the light
-   version: no canvas and no animation loop. */
+   A phone, or a window too narrow for the slides: one column that scrolls like any other page. No dots, no fixed text, no paging
+   (components/Showcase.js leaves all of that off below 1024px), so it is also the light version: no canvas and no animation loop.
+   Each chapter is a card. A card sticks under the top bar while the next one slides up over it; the script sets --top so that a
+   card taller than the screen sticks by its bottom edge, and where the browser can tie animation to scroll position the card being
+   covered shrinks and dims as the next one arrives. */
+@keyframes recede { to { transform: scale(0.94); } }
+@keyframes dim { from { opacity: 0; } to { opacity: 0.62; } }
 @media (max-width: 1023px) {
-  :root { --pad: 20px; --col: min(calc(100vw - 40px), 640px); }
+  :root { --pad: 20px; --bar: 52px; --col: min(calc(100vw - 40px), 640px); }
   html { scroll-padding-top: 56px; } /* a link to a chapter lands it below the top bar */
   .field, .rail { display: none; }
 
-  .nav { height: 52px; }
+  .nav { height: var(--bar); }
   .nav .brand { font-size: 16px; }
   .nav ul { gap: 20px; font-size: 14px; }
   .nav ul li:nth-child(2) { display: none; } /* "Elsewhere": in one column there is nothing to skip over */
   .nav ul a { display: inline-block; padding: 14px 0; } /* a target the size of a finger */
 
-  .ch { --fg: var(--bone); --num: var(--hi); display: block; min-height: 0; padding: 56px var(--pad); border-top: 1px solid var(--rule); }
-  .ch.intro { padding-top: 92px; border-top: 0; }
-  .ch.contact { padding-bottom: 88px; }
+  .ch, .pile {
+    position: sticky; top: var(--top, var(--bar)); display: block;
+    min-height: calc(100vh - var(--bar)); min-height: calc(100svh - var(--bar));
+    background: var(--card);
+    border-top: 1px solid #36332c; border-radius: 26px 26px 0 0; box-shadow: 0 -26px 44px rgba(0, 0, 0, 0.5);
+    transform-origin: 50% 0;
+  }
+  .ch { --fg: var(--bone); --num: var(--hi); padding: 40px var(--pad) 56px; }
+  .ch.intro { padding-top: calc(var(--bar) + 40px); }
+  /* The short chapters at the end (skills, project, mentoring, contact) share one card instead of a screen each, and read as
+     stretches of it, set apart by a hairline. */
+  .pile > .ch { position: static; min-height: 0; background: none; border: 0; border-radius: 0; box-shadow: none; padding: 44px var(--pad); }
+  .pile > .ch:first-of-type { padding-top: 40px; }
+  .pile > .ch + .ch { border-top: 1px solid var(--rule); }
+  .pile > .ch.contact { padding-bottom: 96px; }
+  .sent { display: block; position: absolute; left: 0; top: 0; width: 1px; height: 1px; pointer-events: none; }
+  .pile > .ch > .sent { display: none; }
+  @supports (animation-timeline: view()) {
+    .ch[data-covered] { animation: recede linear both; animation-timeline: var(--tl); animation-range: cover 4% cover 92%; }
+    .ch[data-covered]::before {
+      content: ""; position: absolute; inset: 0; z-index: 4; border-radius: inherit; background: var(--ink); pointer-events: none;
+      animation: dim linear both; animation-timeline: var(--tl); animation-range: cover 4% cover 92%;
+    }
+  }
   .ch-in { width: 100%; max-width: 640px; margin: 0 auto; container-type: inline-size; text-shadow: none; }
 
   .eyebrow { margin-bottom: 14px; }
@@ -313,4 +339,5 @@ main { position: relative; z-index: 1; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: 0.01ms !important; transition-delay: 0ms !important; }
+  .ch[data-covered], .ch[data-covered]::before { animation: none; }
 }

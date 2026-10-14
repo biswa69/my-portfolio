@@ -79,6 +79,7 @@ const Case = memo(function Case({ c, n, st }) {
   const len = to.length + (from && !stacked ? from.length * 0.34 + 1 : 0);
   return (
     <section id={c.id} className={`ch case${side(c.id)}${st}`} aria-labelledby={`${c.id}-t`}>
+      <i className="sent" aria-hidden="true" />
       <div className="ch-in" onFocus={() => !on && reveal(c.id)}>
         <p className="k rv">
           {pad(n + 1)} / {pad(cases.length)} · {c.tag}
@@ -288,6 +289,50 @@ export default function Showcase() {
     };
   }, [wide]);
 
+  // On a phone every chapter is a card that sticks while the next one slides over it (see the narrow block in globals.css).
+  // A card taller than the screen sticks by its bottom edge, so the end of its text can be read before the next card covers it.
+  // Where the browser can tie animation to scroll position, the card being covered shrinks and dims as the next one arrives:
+  // each card's marker (`.sent`) is a scroll timeline of its own, and the card before it follows that timeline.
+  // A card is a chapter, or the group of short ones at the end (`.pile`).
+  useEffect(() => {
+    if (isWide()) return;
+    const main = document.querySelector("main");
+    const cards = main ? [...main.children].filter((el) => el.matches(".ch, .pile")) : [];
+    if (!main || !cards.length) return;
+    const place = () => {
+      const bar = document.querySelector(".nav")?.offsetHeight ?? 52;
+      cards.forEach((c) => c.style.setProperty("--top", `${Math.min(bar, innerHeight - c.offsetHeight)}px`));
+    };
+    const linked = CSS.supports("animation-timeline: view()");
+    if (linked) {
+      main.style.timelineScope = cards.slice(1).map((_, i) => `--s${i + 1}`).join(", ");
+      cards.forEach((c, i) => {
+        const marker = c.querySelector(":scope > .sent");
+        if (i > 0 && marker) marker.style.viewTimeline = `--s${i} block`;
+        if (i < cards.length - 1) {
+          c.setAttribute("data-covered", "");
+          c.style.setProperty("--tl", `--s${i + 1}`);
+        }
+      });
+    }
+    place();
+    const watch = new ResizeObserver(place); // text reflowing (a font arriving, the phone turning) changes a card's height
+    cards.forEach((c) => watch.observe(c));
+    addEventListener("resize", place); // the browser's address bar coming and going changes the screen's height
+    return () => {
+      watch.disconnect();
+      removeEventListener("resize", place);
+      main.style.timelineScope = "";
+      cards.forEach((c) => {
+        c.removeAttribute("data-covered");
+        c.style.removeProperty("--tl");
+        c.style.removeProperty("--top");
+        const marker = c.querySelector(":scope > .sent");
+        if (marker) marker.style.viewTimeline = "";
+      });
+    };
+  }, [wide]);
+
   const shape = chapters.find((c) => c.id === active)?.shape ?? "raw";
   const flip = FLIPPED.has(active);
   const inWork = cases.some((c) => c.id === active);
@@ -325,17 +370,14 @@ export default function Showcase() {
 
       <main>
         <section id="intro" className={`ch intro${side("intro")}${state("intro")}`} aria-label="Introduction">
+          <i className="sent" aria-hidden="true" />
           <div className="ch-in" onFocus={() => !on("intro") && reveal("intro")}>
             <p className="eyebrow rv">
               {hero.eyebrow.flatMap((w, i) => (i ? [<i key={`x${i}`} aria-hidden="true">×</i>, <b key={w}>{w}</b>] : [<b key={w}>{w}</b>]))}
             </p>
             <h1 className="name" aria-label={person.name}>
               {person.name.split(" ").map((word) => (
-                <span key={word} className="rv" aria-hidden="true">
-                  {[...word].map((c, i) => (
-                    <span className="lt" key={i}>{c}</span>
-                  ))}
-                </span>
+                <span key={word} className="rv" aria-hidden="true">{word}</span>
               ))}
             </h1>
             <p className="lead rv">{hero.lead}</p>
@@ -363,67 +405,75 @@ export default function Showcase() {
           <Case key={c.id} c={c} n={n} st={state(c.id)} />
         ))}
 
-        <section id="skills" className={`ch els${side("skills")}${state("skills")}`} aria-labelledby="skills-t">
-          <div className="ch-in" onFocus={() => !on("skills") && reveal("skills")}>
-            <p className="k rv">Elsewhere · skills</p>
-            <h2 id="skills-t" className="sec-t rv">Skills, and where they showed up</h2>
-            <ul className="sk" onPointerLeave={() => setHover(null)}>
-              {skills.map(([name, tools], i) => (
-                <li
-                  key={name}
-                  className={`rv${focus === i ? " on" : ""}`}
-                  tabIndex={0}
-                  onPointerEnter={() => setHover(i)}
-                  onFocus={() => setHover(i)}
-                  onBlur={() => setHover(null)}
-                >
-                  <b>{name}</b>
-                  <span>{tools}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="also rv">{alsoTools}</p>
-            <p className="exp rv">
-              <span className="k">Experience</span>
-              <br />
-              <b>{experience.title}</b>, {experience.where}. {experience.dates}.
-            </p>
-          </div>
-        </section>
+        {/* On a phone these four short chapters are one card, so a screen is not left mostly empty (see `.pile` in globals.css). */}
+        <div className="pile">
+          <i className="sent" aria-hidden="true" />
+          <section id="skills" className={`ch els${side("skills")}${state("skills")}`} aria-labelledby="skills-t">
+            <i className="sent" aria-hidden="true" />
+            <div className="ch-in" onFocus={() => !on("skills") && reveal("skills")}>
+              <p className="k rv">Elsewhere · skills</p>
+              <h2 id="skills-t" className="sec-t rv">Skills, and where they showed up</h2>
+              <ul className="sk" onPointerLeave={() => setHover(null)}>
+                {skills.map(([name, tools], i) => (
+                  <li
+                    key={name}
+                    className={`rv${focus === i ? " on" : ""}`}
+                    tabIndex={0}
+                    onPointerEnter={() => setHover(i)}
+                    onFocus={() => setHover(i)}
+                    onBlur={() => setHover(null)}
+                  >
+                    <b>{name}</b>
+                    <span>{tools}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="also rv">{alsoTools}</p>
+              <p className="exp rv">
+                <span className="k">Experience</span>
+                <br />
+                <b>{experience.title}</b>, {experience.where}. {experience.dates}.
+              </p>
+            </div>
+          </section>
 
-        <section id="smartshelf" className={`ch els${side("smartshelf")}${state("smartshelf")}`} aria-labelledby="smartshelf-t">
-          <div className="ch-in" onFocus={() => !on("smartshelf") && reveal("smartshelf")}>
-            <p className="k rv">Elsewhere · project</p>
-            <h2 id="smartshelf-t" className="sec-t rv">{project.name}</h2>
-            <p className="body rv">{project.text}</p>
-            <p className="also rv">{project.stack}</p>
-            <p className="hint rv">Move your cursor over the dots: it is the emotional cue, and the five closest titles light up.</p>
-          </div>
-        </section>
+          <section id="smartshelf" className={`ch els${side("smartshelf")}${state("smartshelf")}`} aria-labelledby="smartshelf-t">
+            <i className="sent" aria-hidden="true" />
+            <div className="ch-in" onFocus={() => !on("smartshelf") && reveal("smartshelf")}>
+              <p className="k rv">Elsewhere · project</p>
+              <h2 id="smartshelf-t" className="sec-t rv">{project.name}</h2>
+              <p className="body rv">{project.text}</p>
+              <p className="also rv">{project.stack}</p>
+              <p className="hint rv">Move your cursor over the dots: it is the emotional cue, and the five closest titles light up.</p>
+            </div>
+          </section>
 
-        <section id="mentoring" className={`ch els${side("mentoring")}${state("mentoring")}`} aria-labelledby="mentoring-t">
-          <div className="ch-in" onFocus={() => !on("mentoring") && reveal("mentoring")}>
-            <p className="k rv">Elsewhere · leadership</p>
-            <h2 id="mentoring-t" className="sec-t rv">{leadership[0].name}</h2>
-            <p className="body rv">{leadership[0].text}</p>
-            <p className="also rv">
-              Also: {leadership[1].name} ·{" "}
-              <a href={leadership[2].href} target="_blank" rel="noreferrer">{leadership[2].name} ↗</a>
-            </p>
-          </div>
-        </section>
+          <section id="mentoring" className={`ch els${side("mentoring")}${state("mentoring")}`} aria-labelledby="mentoring-t">
+            <i className="sent" aria-hidden="true" />
+            <div className="ch-in" onFocus={() => !on("mentoring") && reveal("mentoring")}>
+              <p className="k rv">Elsewhere · leadership</p>
+              <h2 id="mentoring-t" className="sec-t rv">{leadership[0].name}</h2>
+              <p className="body rv">{leadership[0].text}</p>
+              <p className="also rv">
+                Also: {leadership[1].name} ·{" "}
+                <a href={leadership[2].href} target="_blank" rel="noreferrer">{leadership[2].name} ↗</a>
+              </p>
+            </div>
+          </section>
 
-        <section id="contact" className={`ch contact${side("contact")}${state("contact")}`} aria-labelledby="contact-t">
-          <div className="ch-in" onFocus={() => !on("contact") && reveal("contact")}>
-            <h2 id="contact-t" className="sec-t rv">Contact</h2>
-            <p className="rv"><a className="mail" href={`mailto:${person.email}`}>{person.email}</a></p>
-            <ul className="links rv">
-              <li><a href={person.linkedin} target="_blank" rel="noreferrer">LinkedIn ↗</a></li>
-              <li><a href={person.resume} download>Resume (PDF)</a></li>
-            </ul>
-            <p className="foot rv">© {new Date().getFullYear()} {person.name} · <a href="#intro">Back to top ↑</a></p>
-          </div>
-        </section>
+          <section id="contact" className={`ch contact${side("contact")}${state("contact")}`} aria-labelledby="contact-t">
+            <i className="sent" aria-hidden="true" />
+            <div className="ch-in" onFocus={() => !on("contact") && reveal("contact")}>
+              <h2 id="contact-t" className="sec-t rv">Contact</h2>
+              <p className="rv"><a className="mail" href={`mailto:${person.email}`}>{person.email}</a></p>
+              <ul className="links rv">
+                <li><a href={person.linkedin} target="_blank" rel="noreferrer">LinkedIn ↗</a></li>
+                <li><a href={person.resume} download>Resume (PDF)</a></li>
+              </ul>
+              <p className="foot rv">© {new Date().getFullYear()} {person.name} · <a href="#intro">Back to top ↑</a></p>
+            </div>
+          </section>
+        </div>
       </main>
     </>
   );
