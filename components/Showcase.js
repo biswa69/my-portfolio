@@ -354,7 +354,7 @@ export default function Showcase() {
             <li><a href="#cohort" className={inWork ? "on" : ""}>Work</a></li>
             <li><a href="#skills" className={inElsewhere ? "on" : ""}>Elsewhere</a></li>
             <li><a href="#contact" className={on("contact") ? "on" : ""}>Contact</a></li>
-            <li><a href={person.resume} download>Resume</a></li>
+            <li><a href={person.resume} target="_blank" rel="noreferrer">Resume</a></li>
           </ul>
         </nav>
       </header>
@@ -396,7 +396,7 @@ export default function Showcase() {
             <ul className="links rv">
               <li><a href={`mailto:${person.email}`}>{person.email}</a></li>
               <li><a href={person.linkedin} target="_blank" rel="noreferrer">LinkedIn ↗</a></li>
-              <li><a href={person.resume} download>Resume (PDF)</a></li>
+              <li><a href={person.resume} target="_blank" rel="noreferrer">Resume (PDF)</a></li>
             </ul>
           </div>
         </section>
@@ -468,7 +468,7 @@ export default function Showcase() {
               <p className="rv"><a className="mail" href={`mailto:${person.email}`}>{person.email}</a></p>
               <ul className="links rv">
                 <li><a href={person.linkedin} target="_blank" rel="noreferrer">LinkedIn ↗</a></li>
-                <li><a href={person.resume} download>Resume (PDF)</a></li>
+                <li><a href={person.resume} target="_blank" rel="noreferrer">Resume (PDF)</a></li>
               </ul>
               <p className="foot rv">© {new Date().getFullYear()} {person.name} · <a href="#intro">Back to top ↑</a></p>
             </div>
